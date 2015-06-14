@@ -36,6 +36,8 @@ namespace GB_NS {
 			GB_CPU_EXCEPTION_ALLOC_FAILED = 0,
 			GB_CPU_EXCEPTION_INITIALIZED,
 			GB_CPU_EXCEPTION_INVALID_CMD,
+			GB_CPU_EXCEPTION_INVALID_CODE,
+			GB_CPU_EXCEPTION_INVALID_STATE,
 			GB_CPU_EXCEPTION_UNINITIALIZED,
 		};
 		
@@ -45,6 +47,8 @@ namespace GB_NS {
 			GB_CPU_EXCEPTION_HEADER " Failed to allocate component",
 			GB_CPU_EXCEPTION_HEADER " Component is already initialized",
 			GB_CPU_EXCEPTION_HEADER " Invalid command",
+			GB_CPU_EXCEPTION_HEADER " Invalid command code",
+			GB_CPU_EXCEPTION_HEADER " Invalid state",
 			GB_CPU_EXCEPTION_HEADER " Component is uninitialized",
 			};
 			

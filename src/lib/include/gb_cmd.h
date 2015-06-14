@@ -412,7 +412,7 @@ namespace GB_NS {
 	// RETI
 	#define GB_CMD_RETI_S 0xd9
 
-	// RL (extended)
+	// RL (RLA, extended)
 	#define GB_CMD_RL_A 0x17
 	#define GB_CMD_RL_B 0x10
 	#define GB_CMD_RL_C 0x11
@@ -422,7 +422,7 @@ namespace GB_NS {
 	#define GB_CMD_RL_L 0x15
 	#define GB_CMD_RL_HL_INDIRECT 0x16
 
-	// RLC (extended)
+	// RLC (RLCA, extended)
 	#define GB_CMD_RLC_A 0x07
 	#define GB_CMD_RLC_B 0x00
 	#define GB_CMD_RLC_C 0x01
@@ -432,7 +432,7 @@ namespace GB_NS {
 	#define GB_CMD_RLC_L 0x05
 	#define GB_CMD_RLC_HL_INDIRECT 0x06
 
-	// RR (extended)
+	// RR (RRA, extended)
 	#define GB_CMD_RR_A 0x1f
 	#define GB_CMD_RR_B 0x18
 	#define GB_CMD_RR_C 0x19
@@ -442,7 +442,7 @@ namespace GB_NS {
 	#define GB_CMD_RR_L 0x1d
 	#define GB_CMD_RR_HL_INDIRECT 0x1e
 
-	// RRC (extended)
+	// RRC (RRCA, extended)
 	#define GB_CMD_RRC_A 0x0f
 	#define GB_CMD_RRC_B 0x08
 	#define GB_CMD_RRC_C 0x09

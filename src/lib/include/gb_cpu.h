@@ -34,15 +34,27 @@ namespace GB_NS {
 
 				static _gb_cpu *acquire(void);
 
+				void halt(void);
+
 				void initialize(void);
 
 				static bool is_allocated(void);
 
+				bool is_halted(void);
+
 				bool is_initialized(void);
+
+				bool is_stopped(void);
 
 				void reset(void);
 
+				void resume(void);
+
+				void start(void);
+
 				gbb_t step(void);
+
+				void stop(void);
 
 				std::string to_string(
 					__in_opt bool verb = false
@@ -69,16 +81,184 @@ namespace GB_NS {
 				gbw_t de(void);
 
 				void execute(
-					__in gb_cmd_t cmd,
+					__in gbb_t code
+					);
+
+				void execute_cmd_adc(
+					__in gbb_t code
+					);
+
+				void execute_cmd_add(
+					__in gbb_t code
+					);
+
+				void execute_cmd_and(
+					__in gbb_t code
+					);
+
+				void execute_cmd_bit(
+					__in gbb_t code
+					);
+
+				void execute_cmd_call(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ccf(
+					__in gbb_t code
+					);
+
+				void execute_cmd_cp(
+					__in gbb_t code
+					);
+
+				void execute_cmd_cpl(
+					__in gbb_t code
+					);
+
+				void execute_cmd_daa(
+					__in gbb_t code
+					);
+
+				void execute_cmd_dec(
+					__in gbb_t code
+					);
+
+				void execute_cmd_di(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ei(
+					__in gbb_t code
+					);
+
+				void execute_cmd_halt(
+					__in gbb_t code
+					);
+
+				void execute_cmd_inc(
+					__in gbb_t code
+					);
+
+				void execute_cmd_jp(
+					__in gbb_t code
+					);
+
+				void execute_cmd_jr(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ld(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ldd(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ldh(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ldhl(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ldi(
+					__in gbb_t code
+					);
+
+				void execute_cmd_nop(
+					__in gbb_t code
+					);
+
+				void execute_cmd_or(
+					__in gbb_t code
+					);
+
+				void execute_cmd_pop(
+					__in gbb_t code
+					);
+
+				void execute_cmd_push(
+					__in gbb_t code
+					);
+
+				void execute_cmd_res(
+					__in gbb_t code
+					);
+
+				void execute_cmd_ret(
+					__in gbb_t code
+					);
+
+				void execute_cmd_reti(
+					__in gbb_t code
+					);
+
+				void execute_cmd_rl(
+					__in gbb_t code
+					);
+
+				void execute_cmd_rlc(
+					__in gbb_t code
+					);
+
+				void execute_cmd_rr(
+					__in gbb_t code
+					);
+
+				void execute_cmd_rrc(
+					__in gbb_t code
+					);
+
+				void execute_cmd_rst(
+					__in gbb_t code
+					);
+
+				void execute_cmd_sbc(
+					__in gbb_t code
+					);
+
+				void execute_cmd_scf(
+					__in gbb_t code
+					);
+
+				void execute_cmd_set(
+					__in gbb_t code
+					);
+
+				void execute_cmd_sla(
+					__in gbb_t code
+					);
+
+				void execute_cmd_sra(
+					__in gbb_t code
+					);
+
+				void execute_cmd_srl(
+					__in gbb_t code
+					);
+
+				void execute_cmd_stop(
+					__in gbb_t code
+					);
+
+				void execute_cmd_sub(
+					__in gbb_t code
+					);
+
+				void execute_cmd_swap(
+					__in gbb_t code
+					);
+
+				void execute_cmd_xor(
 					__in gbb_t code
 					);
 
 				void execute_extended(
-					__in gb_cmd_t cmd,
 					__in gbb_t code
 					);
-
-				// TODO: add execution helper routines
 
 				gbw_t hl(void);
 
@@ -114,6 +294,8 @@ namespace GB_NS {
 				gbw_t m_pc, m_sp;
 
 				uint32_t m_tot;
+
+				bool m_halt, m_ime, m_stop;
 
 		} gb_cpu, *gb_cpu_ptr;
 	}

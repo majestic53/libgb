@@ -38,15 +38,18 @@ namespace GB_NS {
 	#define __inout
 	#define __inout_opt
 
+	#define GCD_MAX 9
 	#define BLD_INFO "Copyright (C) 2015 David Jolly"
 	#define BLD_NAME "LIBGB"
 	#define BLD_VER_MAJ 0
 	#define BLD_VER_MIN 1
-	#define BLD_VER_REV 3
+	#define BLD_VER_REV 4
 	#define BLD_VER_WEEK 1524
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8
 	#define BITS_PER_NIBBLE 4
+	#define UINT4_MAX 0xf
+	#define UNKNOWN "UNKNOWN"
 	#define VER_STR \
 		CAT_STR(BLD_VER_MAJ) "." CAT_STR(BLD_VER_MIN) "." \
 		CAT_STR(BLD_VER_WEEK) "." CAT_STR(BLD_VER_REV)
