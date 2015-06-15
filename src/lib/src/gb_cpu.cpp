@@ -53,9 +53,9 @@ namespace GB_NS {
 		#define _DETERMINE_HALF_CARRY(_A_, _B_, _RES_, _LEN_) \
 			(((_RES_) ^ (_A_) ^ (_B_)) & (_LEN_))
 		#define DETERMINE_HALF_CARRY_BYTE(_A_, _B_, _RES_) \
-			_DETERMINE_HALF_CARRY(_A_, _B_, _RES_, UINT8_MAX + 1)
-		#define DETERMINE_HALF_CARRY_NIBBLE(_A_, _B_, _RES_) \
 			_DETERMINE_HALF_CARRY(_A_, _B_, _RES_, UINT4_MAX + 1)
+		#define DETERMINE_HALF_CARRY_WORD(_A_, _B_, _RES_) \
+			_DETERMINE_HALF_CARRY(_A_, _B_, _RES_, UINT8_MAX + 1)
 
 		gb_cpu_ptr gb_cpu::m_inst = NULL;
 
