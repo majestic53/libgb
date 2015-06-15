@@ -15,6 +15,10 @@ Changelog
 =========
 
 ###Version 0.1.1524
+*Update: 6/14/2015*
+
+* Added cpu command helper routines
+
 *Updatd: 6/12/2015*
 
 * Added cpu stepping helper routines

@@ -283,7 +283,53 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_rf = GB_FLAG_H;
+
+			switch(code) {
+				case GB_CODE_AND_A:
+					m_ra &= m_ra;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_B:
+					m_ra &= m_rb;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_C:
+					m_ra &= m_rc;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_D:
+					m_ra &= m_rd;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_E:
+					m_ra &= m_re;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_H:
+					m_ra &= m_rh;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_L:
+					m_ra &= m_rl;
+					m_last = 1;
+					break;
+				case GB_CODE_AND_HL_INDIRECT:
+					m_ra &= m_mmu->read_byte(hl());
+					m_last = 2;
+					break;
+				case GB_CODE_AND_N:
+					m_ra &= m_mmu->read_byte(m_pc++);
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_AND), code);
+			}
+
+			if(!m_ra) {
+				m_rf |= GB_FLAG_Z;
+			}
 		}
 
 		void 
@@ -425,342 +471,342 @@ namespace GB_NS {
 		{
 
 			switch(code) {
-				case GB_CMD_LD_B_N:
+				case GB_CODE_LD_B_N:
 					m_rb = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_C_N:
+				case GB_CODE_LD_C_N:
 					m_rc = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_D_N:
+				case GB_CODE_LD_D_N:
 					m_rd = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_E_N:
+				case GB_CODE_LD_E_N:
 					m_re = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_H_N:
+				case GB_CODE_LD_H_N:
 					m_rh = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_L_N:
+				case GB_CODE_LD_L_N:
 					m_rl = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_A_A:
+				case GB_CODE_LD_A_A:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_B:
+				case GB_CODE_LD_A_B:
 					m_ra = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_C:
+				case GB_CODE_LD_A_C:
 					m_ra = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_D:
+				case GB_CODE_LD_A_D:
 					m_ra = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_E:
+				case GB_CODE_LD_A_E:
 					m_ra = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_H:
+				case GB_CODE_LD_A_H:
 					m_ra = m_rh;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_L:
+				case GB_CODE_LD_A_L:
 					m_ra = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_A_HL_INDIRECT:
+				case GB_CODE_LD_A_HL_INDIRECT:
 					m_ra = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_B_B:
+				case GB_CODE_LD_B_B:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_C:
+				case GB_CODE_LD_B_C:
 					m_rb = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_D:
+				case GB_CODE_LD_B_D:
 					m_rb = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_E:
+				case GB_CODE_LD_B_E:
 					m_rb = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_H:
+				case GB_CODE_LD_B_H:
 					m_rb = m_rh;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_L:
+				case GB_CODE_LD_B_L:
 					m_rb = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_B_HL_INDIRECT:
+				case GB_CODE_LD_B_HL_INDIRECT:
 					m_rb = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_C_B:
+				case GB_CODE_LD_C_B:
 					m_rc = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_C:
+				case GB_CODE_LD_C_C:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_D:
+				case GB_CODE_LD_C_D:
 					m_rc = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_E:
+				case GB_CODE_LD_C_E:
 					m_rc = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_H:
+				case GB_CODE_LD_C_H:
 					m_rc = m_rh;
 					m_last = 1;
 					break;		
-				case GB_CMD_LD_C_L:
+				case GB_CODE_LD_C_L:
 					m_rc = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_HL_INDIRECT:
+				case GB_CODE_LD_C_HL_INDIRECT:
 					m_rc = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_D_B:
+				case GB_CODE_LD_D_B:
 					m_rd = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_C:
+				case GB_CODE_LD_D_C:
 					m_rd = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_D:
+				case GB_CODE_LD_D_D:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_E:
+				case GB_CODE_LD_D_E:
 					m_rd = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_H:
+				case GB_CODE_LD_D_H:
 					m_rd = m_rh;
 					m_last = 1;
 					break;		
-				case GB_CMD_LD_D_L:
+				case GB_CODE_LD_D_L:
 					m_rd = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_HL_INDIRECT:
+				case GB_CODE_LD_D_HL_INDIRECT:
 					m_rd = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_E_B:
+				case GB_CODE_LD_E_B:
 					m_re = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_C:
+				case GB_CODE_LD_E_C:
 					m_re = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_D:
+				case GB_CODE_LD_E_D:
 					m_re = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_E:
+				case GB_CODE_LD_E_E:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_H:
+				case GB_CODE_LD_E_H:
 					m_re = m_rh;
 					m_last = 1;
 					break;		
-				case GB_CMD_LD_E_L:
+				case GB_CODE_LD_E_L:
 					m_re = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_HL_INDIRECT:
+				case GB_CODE_LD_E_HL_INDIRECT:
 					m_re = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_H_B:
+				case GB_CODE_LD_H_B:
 					m_rh = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_C:
+				case GB_CODE_LD_H_C:
 					m_rh = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_D:
+				case GB_CODE_LD_H_D:
 					m_rh = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_E:
+				case GB_CODE_LD_H_E:
 					m_rh = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_H:
+				case GB_CODE_LD_H_H:
 					m_last = 1;
 					break;		
-				case GB_CMD_LD_H_L:
+				case GB_CODE_LD_H_L:
 					m_rh = m_rl;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_HL_INDIRECT:
+				case GB_CODE_LD_H_HL_INDIRECT:
 					m_rh = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_L_B:
+				case GB_CODE_LD_L_B:
 					m_rl = m_rb;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_C:
+				case GB_CODE_LD_L_C:
 					m_rl = m_rc;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_D:
+				case GB_CODE_LD_L_D:
 					m_rl = m_rd;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_E:
+				case GB_CODE_LD_L_E:
 					m_rl = m_re;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_H:
+				case GB_CODE_LD_L_H:
 					m_rl = m_rh;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_L:
+				case GB_CODE_LD_L_L:
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_HL_INDIRECT:
+				case GB_CODE_LD_L_HL_INDIRECT:
 					m_rl = m_mmu->read_byte(hl());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_B:
+				case GB_CODE_LD_HL_INDIRECT_B:
 					m_mmu->write_byte(hl(), m_rb);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_C:
+				case GB_CODE_LD_HL_INDIRECT_C:
 					m_mmu->write_byte(hl(), m_rc);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_D:
+				case GB_CODE_LD_HL_INDIRECT_D:
 					m_mmu->write_byte(hl(), m_rd);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_E:
+				case GB_CODE_LD_HL_INDIRECT_E:
 					m_mmu->write_byte(hl(), m_re);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_H:
+				case GB_CODE_LD_HL_INDIRECT_H:
 					m_mmu->write_byte(hl(), m_rh);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_L:
+				case GB_CODE_LD_HL_INDIRECT_L:
 					m_mmu->write_byte(hl(), m_rl);
 					m_last = 2;
 					break;	
-				case GB_CMD_LD_HL_INDIRECT_N:
+				case GB_CODE_LD_HL_INDIRECT_N:
 					m_mmu->write_byte(hl(), m_mmu->read_byte(m_pc++));
 					m_last = 3;
 					break;
-				case GB_CMD_LD_A_BC_INDIRECT:
+				case GB_CODE_LD_A_BC_INDIRECT:
 					m_ra = m_mmu->read_byte(bc());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_A_DE_INDIRECT:
+				case GB_CODE_LD_A_DE_INDIRECT:
 					m_ra = m_mmu->read_byte(de());
 					m_last = 2;
 					break;
-				case GB_CMD_LD_A_NN_INDIRECT:
+				case GB_CODE_LD_A_NN_INDIRECT:
 					m_ra = m_mmu->read_byte(m_mmu->read_word(m_pc));
 					m_pc += sizeof(gbw_t);
 					m_last = 4;
 					break;
-				case GB_CMD_LD_A_N:
+				case GB_CODE_LD_A_N:
 					m_ra = m_mmu->read_byte(m_pc++);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_B_A:
+				case GB_CODE_LD_B_A:
 					m_rb = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_C_A:
+				case GB_CODE_LD_C_A:
 					m_rc = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_D_A:
+				case GB_CODE_LD_D_A:
 					m_rd = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_E_A:
+				case GB_CODE_LD_E_A:
 					m_re = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_H_A:
+				case GB_CODE_LD_H_A:
 					m_rh = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_L_A:
+				case GB_CODE_LD_L_A:
 					m_rl = m_ra;
 					m_last = 1;
 					break;
-				case GB_CMD_LD_BC_INDIRECT_A:
+				case GB_CODE_LD_BC_INDIRECT_A:
 					m_mmu->write_byte(m_mmu->read_byte(bc()), m_ra);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_DE_INDIRECT_A:
+				case GB_CODE_LD_DE_INDIRECT_A:
 					m_mmu->write_byte(m_mmu->read_byte(de()), m_ra);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_HL_INDIRECT_A:
+				case GB_CODE_LD_HL_INDIRECT_A:
 					m_mmu->write_byte(m_mmu->read_byte(hl()), m_ra);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_NN_INDIRECT_A:
+				case GB_CODE_LD_NN_INDIRECT_A:
 					m_mmu->write_byte(m_mmu->read_byte(m_mmu->read_word(m_pc)), m_ra);
 					m_pc += sizeof(gbw_t);
 					m_last = 4;
 					break;
-				case GB_CMD_LD_A_C_INDIRECT:
+				case GB_CODE_LD_A_C_INDIRECT:
 					m_ra = m_mmu->read_byte(m_rc + 0xff00);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_C_INDIRECT_A:
+				case GB_CODE_LD_C_INDIRECT_A:
 					m_mmu->write_byte(m_rc + 0xff00, m_ra);
 					m_last = 2;
 					break;
-				case GB_CMD_LD_BC_NN:
+				case GB_CODE_LD_BC_NN:
 					set_bc(m_mmu->read_word(m_pc));
 					m_pc += sizeof(gbw_t);
 					m_last = 3;
 					break;
-				case GB_CMD_LD_DE_NN:
+				case GB_CODE_LD_DE_NN:
 					set_de(m_mmu->read_word(m_pc));
 					m_pc += sizeof(gbw_t);
 					m_last = 3;
 					break;
-				case GB_CMD_LD_HL_NN:
+				case GB_CODE_LD_HL_NN:
 					set_hl(m_mmu->read_word(m_pc));
 					m_pc += sizeof(gbw_t);
 					m_last = 3;
 					break;
-				case GB_CMD_LD_SP_NN:
+				case GB_CODE_LD_SP_NN:
 					m_sp = m_mmu->read_word(m_pc);
 					m_pc += sizeof(gbw_t);
 					m_last = 3;
 					break;
-				case GB_CMD_LD_SP_HL:
+				case GB_CODE_LD_SP_HL:
 					m_sp = hl();
 					m_last = 2;
 					break;
-				case GB_CMD_LD_NN_INDIRECT_SP:
+				case GB_CODE_LD_NN_INDIRECT_SP:
 					m_mmu->write_word(m_mmu->read_word(m_pc), m_sp);
 					m_pc += sizeof(gbw_t);
 					m_last = 5;
@@ -816,7 +862,53 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_OR_A:
+					m_ra |= m_ra;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_B:
+					m_ra |= m_rb;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_C:
+					m_ra |= m_rc;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_D:
+					m_ra |= m_rd;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_E:
+					m_ra |= m_re;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_H:
+					m_ra |= m_rh;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_L:
+					m_ra |= m_rl;
+					m_last = 1;
+					break;
+				case GB_CODE_OR_HL_INDIRECT:
+					m_ra |= m_mmu->read_byte(hl());
+					m_last = 2;
+					break;
+				case GB_CODE_OR_N:
+					m_ra |= m_mmu->read_byte(m_pc++);
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_OR), code);
+			}
+
+			if(!m_ra) {
+				m_rf |= GB_FLAG_Z;
+			}
 		}
 
 		void 
@@ -824,7 +916,27 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_POP_AF:
+					set_af(m_mmu->read_word(m_sp));
+					break;
+				case GB_CODE_POP_BC:
+					set_bc(m_mmu->read_word(m_sp));
+					break;
+				case GB_CODE_POP_DE:
+					set_de(m_mmu->read_word(m_sp));
+					break;
+				case GB_CODE_POP_HL:
+					set_hl(m_mmu->read_word(m_sp));
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_POP), code);
+			}
+
+			m_sp += sizeof(gbw_t);
+			m_last = 3;
 		}
 
 		void 
@@ -832,7 +944,27 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_PUSH_AF:
+					m_mmu->write_word(m_sp, af());
+					break;
+				case GB_CODE_PUSH_BC:
+					m_mmu->write_word(m_sp, bc());
+					break;
+				case GB_CODE_PUSH_DE:
+					m_mmu->write_word(m_sp, de());
+					break;
+				case GB_CODE_PUSH_HL:
+					m_mmu->write_word(m_sp, hl());
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_PUSH), code);
+			}
+
+			m_sp -= sizeof(gbw_t);
+			m_last = 4;
 		}
 
 		void 
@@ -896,7 +1028,40 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_mmu->write_word(m_pc);
+			m_pc += sizeof(gbw_t);
+
+			switch(code) {
+				case GB_CODE_RST_0:
+					m_pc = 0x0000;
+					break;
+				case GB_CODE_RST_8:
+					m_pc = 0x0008;
+					break;
+				case GB_CODE_RST_10:
+					m_pc = 0x0010;
+					break;
+				case GB_CODE_RST_18:
+					m_pc = 0x0018;
+					break;
+				case GB_CODE_RST_20:
+					m_pc = 0x0020;
+					break;
+				case GB_CODE_RST_28:
+					m_pc = 0x0028;
+					break;
+				case GB_CODE_RST_30:
+					m_pc = 0x0030;
+					break;
+				case GB_CODE_RST_38:
+					m_pc = 0x0038;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RST), code);
+			}
+
+			m_last = 8;
 		}
 
 		void 
@@ -971,7 +1136,55 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t orig;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_SWAP_A:
+					orig = m_ra;
+					m_ra = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_B:
+					orig = m_rb;
+					m_rb = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_C:
+					orig = m_rc;
+					m_rc = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_D:
+					orig = m_rd;
+					m_rd = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_E:
+					orig = m_re;
+					m_re = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_H:
+					orig = m_rh;
+					m_rh = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;		
+				case GB_CODE_SWAP_L:
+					orig = m_rl;
+					m_rl = ((orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 2;
+					break;
+				case GB_CODE_SWAP_HL_INDIRECT:
+					orig = m_mmu->read_byte(hl());
+					m_mmu->write_byte(hl(), (orig << BITS_PER_NIBBLE) | (orig >> BITS_PER_NIBBLE));
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SWAP), code);
+			}
 		}
 
 		void 
@@ -979,7 +1192,53 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_XOR_A:
+					m_ra ^= m_ra;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_B:
+					m_ra ^= m_rb;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_C:
+					m_ra ^= m_rc;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_D:
+					m_ra ^= m_rd;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_E:
+					m_ra ^= m_re;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_H:
+					m_ra ^= m_rh;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_L:
+					m_ra ^= m_rl;
+					m_last = 1;
+					break;
+				case GB_CODE_XOR_HL_INDIRECT:
+					m_ra ^= m_mmu->read_byte(hl());
+					m_last = 2;
+					break;
+				case GB_CODE_XOR_N:
+					m_ra ^= m_mmu->read_byte(m_pc++);
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_XOR), code);
+			}
+
+			if(!m_ra) {
+				m_rf |= GB_FLAG_Z;
+			}
 		}
 
 		void 
@@ -1183,7 +1442,7 @@ namespace GB_NS {
 			}
 
 			code = m_mmu->read_byte(m_pc++);
-			if(code == GB_CMD_EXT) {
+			if(code == GB_CODE_EXT) {
 				code = m_mmu->read_byte(m_pc++);
 				execute_extended(code);
 			} else {
