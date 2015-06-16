@@ -43,8 +43,8 @@ namespace GB_NS {
 	#define BLD_NAME "LIBGB"
 	#define BLD_VER_MAJ 0
 	#define BLD_VER_MIN 1
-	#define BLD_VER_REV 4
-	#define BLD_VER_WEEK 1524
+	#define BLD_VER_REV 1
+	#define BLD_VER_WEEK 1525
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8
 	#define BITS_PER_NIBBLE 4
@@ -74,6 +74,10 @@ namespace GB_NS {
 	#define GBW_MAX_LEN UINT16_MAX
 
 	typedef uint16_t gbw_t;
+
+	#define GBDW_MAX_LEN UINT32_MAX
+
+	typedef uint32_t gbdw_t;
 }
 
 #endif // GB_DEFINE_H_

@@ -14,14 +14,19 @@ Table of Contents
 Changelog
 =========
 
+###Version 0.1.1525
+*Updated: 6/15/2015*
+
+* Added cpu command helper routines (partial)
+
 ###Version 0.1.1524
 *Update: 6/14/2015*
 
-* Added cpu command helper routines
+* Added cpu command helper routines (partial)
 
 *Updatd: 6/12/2015*
 
-* Added cpu stepping helper routines
+* Added cpu stepping helper routines (complete)
 
 *Updated: 6/10/2015*
 

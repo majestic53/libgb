@@ -49,13 +49,23 @@ namespace GB_NS {
 		#define GB_REG_L_ALT_INIT 0x00
 		#define GB_REG_PC_INIT 0x0000
 		#define GB_REG_SP_INIT 0x0000
+		#define GB_RST_VEC_0 0x0000
+		#define GB_RST_VEC_8 0x0008
+		#define GB_RST_VEC_10 0x0010
+		#define GB_RST_VEC_18 0x0018
+		#define GB_RST_VEC_20 0x0020
+		#define GB_RST_VEC_28 0x0028
+		#define GB_RST_VEC_30 0x0030
+		#define GB_RST_VEC_38 0x0038
 
-		#define _DETERMINE_HALF_CARRY(_A_, _B_, _RES_, _LEN_) \
+		#define DETERMINE_HALF_CARRY(_A_, _B_) \
+			(((_A_) ^ (_B_)) & (UINT4_MAX + 1))
+		#define _DETERMINE_HALF_CARRY(_RES_, _A_, _B_, _LEN_) \
 			(((_RES_) ^ (_A_) ^ (_B_)) & (_LEN_))
-		#define DETERMINE_HALF_CARRY_BYTE(_A_, _B_, _RES_) \
-			_DETERMINE_HALF_CARRY(_A_, _B_, _RES_, UINT4_MAX + 1)
-		#define DETERMINE_HALF_CARRY_WORD(_A_, _B_, _RES_) \
-			_DETERMINE_HALF_CARRY(_A_, _B_, _RES_, UINT8_MAX + 1)
+		#define DETERMINE_HALF_CARRY_BYTE(_RES_, _A_, _B_) \
+			_DETERMINE_HALF_CARRY(_RES_, _A_, _B_, UINT4_MAX + 1)
+		#define DETERMINE_HALF_CARRY_WORD(_RES_, _A_, _B_) \
+			_DETERMINE_HALF_CARRY(_RES_, _A_, _B_, UINT8_MAX + 1)
 
 		gb_cpu_ptr gb_cpu::m_inst = NULL;
 
@@ -267,15 +277,461 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbw_t res;
+			gbb_t carry = (m_rf & GB_FLAG_C), val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_ADC_A_A:
+
+					res = m_ra + m_ra + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_ra + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_B:
+
+					res = m_ra + m_rb + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rb + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_C:
+
+					res = m_ra + m_rc + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rc + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_D:
+
+					res = m_ra + m_rd + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rd + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_E:
+
+					res = m_ra + m_re + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_re + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_H:
+
+					res = m_ra + m_rh + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rh + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_L:
+
+					res = m_ra + m_rl + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rl + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 1;
+					break;
+				case GB_CODE_ADC_A_HL_INDIRECT:
+					val = m_mmu->read_byte(hl());
+
+					res = m_ra + val + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 2;
+					break;
+				case GB_CODE_ADC_A_N:
+					val = m_mmu->read_byte(m_pc++);
+
+					res = m_ra + val + carry;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val + carry)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_ADC), code);
+			}
 		}
 
 		void 
 		_gb_cpu::execute_cmd_add(
 			__in gbb_t code
 			)
-		{
-			// TODO
+		{			
+			gbb_t val;
+			gbdw_t res;
+			int8_t off;
+			gbw_t tmp0, tmp1;
+
+			switch(code) {
+				case GB_CODE_ADD_A_A:
+					m_rf = 0;
+
+					res = m_ra + m_ra;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_ra)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_B:
+					m_rf = 0;
+
+					res = m_ra + m_rb;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rb)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_C:
+					m_rf = 0;
+
+					res = m_ra + m_rc;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rc)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_D:
+					m_rf = 0;
+
+					res = m_ra + m_rd;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rd)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_E:
+					m_rf = 0;
+
+					res = m_ra + m_re;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_re)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_H:
+					m_rf = 0;
+
+					res = m_ra + m_rh;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rh)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_L:
+					m_rf = 0;
+
+					res = m_ra + m_rl;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rl)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_ADD_A_HL_INDIRECT:
+					m_rf = 0;
+					val = m_mmu->read_byte(hl());
+
+					res = m_ra + val;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_A_N:
+					m_rf = 0;
+					val = m_mmu->read_byte(m_pc++);
+
+					res = m_ra + val;
+					if(res > GBB_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_HL_BC:
+					m_rf &= ~(GB_FLAG_C | GB_FLAG_H | GB_FLAG_N);
+					tmp0 = hl();
+					tmp1 = bc();
+
+					res = tmp0 + tmp1;
+					if(res > GBW_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_WORD(res, tmp0, tmp1)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					set_hl(res);
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_HL_DE:
+					m_rf &= ~(GB_FLAG_C | GB_FLAG_H | GB_FLAG_N);
+					tmp0 = hl();
+					tmp1 = de();
+
+					res = tmp0 + tmp1;
+					if(res > GBW_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_WORD(res, tmp0, tmp1)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					set_hl(res);
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_HL_HL:
+					m_rf &= ~(GB_FLAG_C | GB_FLAG_H | GB_FLAG_N);
+					tmp0 = hl();
+					tmp1 = hl();
+
+					res = tmp0 + tmp1;
+					if(res > GBW_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_WORD(res, tmp0, tmp1)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					set_hl(res);
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_HL_SP:
+					m_rf &= ~(GB_FLAG_C | GB_FLAG_H | GB_FLAG_N);
+					tmp0 = hl();
+
+					res = tmp0 + m_sp;
+					if(res > GBW_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					if(DETERMINE_HALF_CARRY_WORD(res, tmp0, m_sp)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					set_hl(res);
+					m_last = 2;
+					break;
+				case GB_CODE_ADD_SP_N:
+					m_rf = 0;
+					tmp0 = m_sp;
+					off = m_mmu->read_byte(m_pc++);
+
+					if((m_sp + off) > GBW_MAX_LEN) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_sp += off;
+
+					if(DETERMINE_HALF_CARRY_WORD(m_sp, tmp0, off)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_ADD), code);
+			}
 		}
 
 		void 
@@ -337,7 +793,526 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_rf |= GB_FLAG_H;
+			m_rf &= ~GB_FLAG_N;
+
+			switch(code) {
+				case GB_CODE_BIT_0_A:
+
+					if(!(m_ra & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_B:
+
+					if(!(m_rb & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_C:
+
+					if(!(m_rc & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_D:
+
+					if(!(m_rd & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_E:
+
+					if(!(m_re & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_H:
+
+					if(!(m_rh & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_L:
+
+					if(!(m_rl & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_0_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x1)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_1_A:
+
+					if(!(m_ra & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_B:
+
+					if(!(m_rb & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_C:
+
+					if(!(m_rc & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_D:
+
+					if(!(m_rd & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_E:
+
+					if(!(m_re & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_H:
+
+					if(!(m_rh & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_L:
+
+					if(!(m_rl & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_1_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x2)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_2_A:
+
+					if(!(m_ra & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_B:
+
+					if(!(m_rb & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_C:
+
+					if(!(m_rc & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_D:
+
+					if(!(m_rd & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_E:
+
+					if(!(m_re & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_H:
+
+					if(!(m_rh & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_L:
+
+					if(!(m_rl & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_2_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x4)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_3_A:
+
+					if(!(m_ra & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_B:
+
+					if(!(m_rb & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_C:
+
+					if(!(m_rc & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_D:
+
+					if(!(m_rd & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_E:
+
+					if(!(m_re & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_H:
+
+					if(!(m_rh & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_L:
+
+					if(!(m_rl & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_3_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x8)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_4_A:
+
+					if(!(m_ra & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_B:
+
+					if(!(m_rb & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_C:
+
+					if(!(m_rc & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_D:
+
+					if(!(m_rd & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_E:
+
+					if(!(m_re & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_H:
+
+					if(!(m_rh & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_L:
+
+					if(!(m_rl & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_4_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x10)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_5_A:
+
+					if(!(m_ra & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_B:
+
+					if(!(m_rb & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_C:
+
+					if(!(m_rc & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_D:
+
+					if(!(m_rd & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_E:
+
+					if(!(m_re & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_H:
+
+					if(!(m_rh & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_L:
+
+					if(!(m_rl & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_5_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x20)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_6_A:
+
+					if(!(m_ra & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_B:
+
+					if(!(m_rb & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_C:
+
+					if(!(m_rc & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_D:
+
+					if(!(m_rd & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_E:
+
+					if(!(m_re & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_H:
+
+					if(!(m_rh & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_L:
+
+					if(!(m_rl & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_6_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x40)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				case GB_CODE_BIT_7_A:
+
+					if(!(m_ra & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_B:
+
+					if(!(m_rb & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_C:
+
+					if(!(m_rc & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_D:
+
+					if(!(m_rd & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_E:
+
+					if(!(m_re & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_H:
+
+					if(!(m_rh & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_L:
+
+					if(!(m_rl & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_BIT_7_HL_INDIRECT:
+
+					if(!(m_mmu->read_byte(hl()) & 0x80)) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_BIT), code);
+			}
 		}
 
 		void 
@@ -345,7 +1320,65 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbw_t addr;
+
+			switch(code) {
+				case GB_CODE_CALL_NN:
+					addr = m_mmu->read_word(m_pc);
+					m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
+					m_pc = addr;
+					m_sp -= sizeof(gbw_t);
+					break;
+				case GB_CODE_CALL_NZ_NN:
+
+					if(!(m_rf & GB_FLAG_Z)) {
+						addr = m_mmu->read_word(m_pc);
+						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
+						m_pc = addr;
+						m_sp -= sizeof(gbw_t);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+					break;
+				case GB_CODE_CALL_Z_NN:
+
+					if(m_rf & GB_FLAG_Z) {
+						addr = m_mmu->read_word(m_pc);
+						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
+						m_pc = addr;
+						m_sp -= sizeof(gbw_t);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+					break;
+				case GB_CODE_CALL_NC_NN:
+
+					if(!(m_rf & GB_FLAG_C)) {
+						addr = m_mmu->read_word(m_pc);
+						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
+						m_pc = addr;
+						m_sp -= sizeof(gbw_t);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+					break;
+				case GB_CODE_CALL_C_NN:
+
+					if(m_rf & GB_FLAG_C) {
+						addr = m_mmu->read_word(m_pc);
+						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
+						m_pc = addr;
+						m_sp -= sizeof(gbw_t);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_CALL), code);
+			}
+
+			m_last = 3;
 		}
 
 		void 
@@ -363,7 +1396,166 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t res, val;
+
+			m_rf = GB_FLAG_N;
+
+			switch(code) {
+				case GB_CODE_CP_A:
+
+					res = m_ra - m_ra;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_ra)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_B:
+
+					if(m_ra < m_rb) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rb;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rb)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_C:
+
+					if(m_ra < m_rc) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rc;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rc)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_D:
+
+					if(m_ra < m_rd) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rd;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rd)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_E:
+
+					if(m_ra < m_re) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_re;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_re)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_H:
+
+					if(m_ra < m_rh) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rh;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rh)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_L:
+
+					if(m_ra < m_rl) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rl;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rl)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_CP_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_CP_N:
+
+					val = m_mmu->read_byte(m_pc++);
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_CP), code);
+			}
 		}
 
 		void 
@@ -410,7 +1602,173 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t orig, tmp;
+
+			m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+			m_rf |= GB_FLAG_N;
+
+			switch(code) {
+				case GB_CODE_DEC_A:
+					orig = m_ra;
+					--m_ra;
+
+					if(DETERMINE_HALF_CARRY(m_ra, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_B:
+					orig = m_rb;
+					--m_rb;
+
+					if(DETERMINE_HALF_CARRY(m_rb, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_C:
+					orig = m_rc;
+					--m_rc;
+
+					if(DETERMINE_HALF_CARRY(m_rc, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_D:
+					orig = m_rd;
+					--m_rd;
+
+					if(DETERMINE_HALF_CARRY(m_rd, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_E:
+					orig = m_re;
+					--m_re;
+
+					if(DETERMINE_HALF_CARRY(m_re, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_H:
+					orig = m_rh;
+					--m_rh;
+
+					if(DETERMINE_HALF_CARRY(m_rh, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_L:
+					orig = m_rl;
+					--m_rl;
+
+					if(DETERMINE_HALF_CARRY(m_rl, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_DEC_HL_INDIRECT:
+					orig = m_mmu->read_byte(hl());
+					tmp = orig;
+					--orig;
+
+					if(DETERMINE_HALF_CARRY(orig, tmp)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!orig) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), orig);
+					m_last = 3;
+					break;
+				case GB_CODE_DEC_BC:
+
+					if(m_rb) {
+						--m_rb;
+					} else if(m_rc) {
+						--m_rc;
+					} else {
+						m_rb = GBB_MAX_LEN;
+						m_rc = GBB_MAX_LEN;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_DEC_DE:
+
+					if(m_rd) {
+						--m_rd;
+					} else if(m_re) {
+						--m_re;
+					} else {
+						m_rd = GBB_MAX_LEN;
+						m_re = GBB_MAX_LEN;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_DEC_HL:
+
+					if(m_rh) {
+						--m_rh;
+					} else if(m_rl) {
+						--m_rl;
+					} else {
+						m_rh = GBB_MAX_LEN;
+						m_rl = GBB_MAX_LEN;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_DEC_SP:
+					--m_sp;
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_DEC), code);
+			}
 		}
 
 		void 
@@ -445,7 +1803,170 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t orig, tmp;
+
+			switch(code) {
+				case GB_CODE_INC_A:
+					orig = m_ra;
+					++m_ra;
+
+					if(DETERMINE_HALF_CARRY(m_ra, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_INC_B:
+					orig = m_rb;
+					++m_rb;
+
+					if(DETERMINE_HALF_CARRY(m_rb, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_INC_C:
+					orig = m_rc;
+					++m_rc;
+
+					if(DETERMINE_HALF_CARRY(m_rc, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;		
+				case GB_CODE_INC_D:
+					orig = m_rd;
+					++m_rd;
+
+					if(DETERMINE_HALF_CARRY(m_rd, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_INC_E:
+					orig = m_re;
+					++m_re;
+
+					if(DETERMINE_HALF_CARRY(m_re, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;		
+				case GB_CODE_INC_H:
+					orig = m_rh;
+					++m_rh;
+
+					if(DETERMINE_HALF_CARRY(m_rh, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_INC_L:
+					orig = m_rl;
+					++m_rl;
+
+					if(DETERMINE_HALF_CARRY(m_rl, orig)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 1;
+					break;
+				case GB_CODE_INC_HL_INDIRECT:
+					orig = m_mmu->read_byte(hl());
+					tmp = orig;
+					++orig;
+
+					if(DETERMINE_HALF_CARRY(orig, tmp)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					if(!orig) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), orig);
+					m_last = 3;
+					break;
+				case GB_CODE_INC_BC:
+
+					if(m_rc < GBB_MAX_LEN) {
+						++m_rc;
+					} else if(m_rb < GBB_MAX_LEN) {
+						++m_rb;
+					} else {
+						m_rb = 0;
+						m_rc = 0;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_INC_DE:
+
+					if(m_re < GBB_MAX_LEN) {
+						++m_re;
+					} else if(m_rd < GBB_MAX_LEN) {
+						++m_rd;
+					} else {
+						m_rd = 0;
+						m_re = 0;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_INC_HL:
+
+					if(m_rl < GBB_MAX_LEN) {
+						++m_rl;
+					} else if(m_rh < GBB_MAX_LEN) {
+						++m_rh;
+					} else {
+						m_rh = 0;
+						m_rl = 0;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_INC_SP:
+					++m_sp;
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_INC), code);
+			}
 		}
 
 		void 
@@ -453,7 +1974,60 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_JP_NN:
+					m_pc = m_mmu->read_word(m_pc);
+					m_last = 3;
+					break;
+				case GB_CODE_JP_NZ_NN:
+
+					if(!(m_rf & GB_FLAG_Z)) {
+						m_pc = m_mmu->read_word(m_pc);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+
+					m_last = 3;
+					break;
+				case GB_CODE_JP_Z_NN:
+
+					if(m_rf & GB_FLAG_Z) {
+						m_pc = m_mmu->read_word(m_pc);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+
+					m_last = 3;
+					break;
+				case GB_CODE_JP_NC_NN:
+
+					if(!(m_rf & GB_FLAG_C)) {
+						m_pc = m_mmu->read_word(m_pc);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+
+					m_last = 3;
+					break;
+				case GB_CODE_JP_C_NN:
+
+					if(m_rf & GB_FLAG_C) {
+						m_pc = m_mmu->read_word(m_pc);
+					} else {
+						m_pc += sizeof(gbw_t);
+					}
+
+					m_last = 3;
+					break;
+				case GB_CODE_JP_HL_INDIRECT:
+					m_pc = hl();
+					m_last = 1;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_JP), code);
+			}
 		}
 
 		void 
@@ -461,7 +2035,42 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			int8_t off = m_mmu->read_byte(m_pc++);
+
+			switch(code) {
+				case GB_CODE_JR_N:
+					m_pc += off;
+					break;
+				case GB_CODE_JR_NZ_N:
+
+					if(!(m_rf & GB_FLAG_Z)) {
+						m_pc += off;
+					}
+					break;		
+				case GB_CODE_JR_Z_N:
+
+					if(m_rf & GB_FLAG_Z) {
+						m_pc += off;
+					}
+					break;
+				case GB_CODE_JR_NC_N:
+
+					if(!(m_rf & GB_FLAG_C)) {
+						m_pc += off;
+					}
+					break;
+				case GB_CODE_JR_C_N:
+
+					if(m_rf & GB_FLAG_C) {
+						m_pc += off;
+					}
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_JR), code);
+			}
+
+			m_last = 2;
 		}
 
 		void 
@@ -972,7 +2581,268 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_RES_0_A:
+					m_ra &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_B:
+					m_rb &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_C:
+					m_rc &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_D:
+					m_rd &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_E:
+					m_re &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_H:
+					m_rh &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_L:
+					m_rl &= ~0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_0_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x1);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_1_A:
+					m_ra &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_B:
+					m_rb &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_C:
+					m_rc &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_D:
+					m_rd &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_E:
+					m_re &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_H:
+					m_rh &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_L:
+					m_rl &= ~0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_1_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x2);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_2_A:
+					m_ra &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_B:
+					m_rb &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_C:
+					m_rc &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_D:
+					m_rd &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_E:
+					m_re &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_H:
+					m_rh &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_L:
+					m_rl &= ~0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_2_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x4);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_3_A:
+					m_ra &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_B:
+					m_rb &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_C:
+					m_rc &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_D:
+					m_rd &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_E:
+					m_re &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_H:
+					m_rh &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_L:
+					m_rl &= ~0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_3_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x8);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_4_A:
+					m_ra &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_B:
+					m_rb &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_C:
+					m_rc &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_D:
+					m_rd &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_E:
+					m_re &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_H:
+					m_rh &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_L:
+					m_rl &= ~0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_4_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x10);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_5_A:
+					m_ra &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_B:
+					m_rb &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_C:
+					m_rc &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_D:
+					m_rd &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_E:
+					m_re &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_H:
+					m_rh &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_L:
+					m_rl &= ~0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_5_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x20);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_6_A:
+					m_ra &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_B:
+					m_rb &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_C:
+					m_rc &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_D:
+					m_rd &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_E:
+					m_re &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_H:
+					m_rh &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_L:
+					m_rl &= ~0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_6_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x40);
+					m_last = 4;
+					break;
+				case GB_CODE_RES_7_A:
+					m_ra &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_B:
+					m_rb &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_C:
+					m_rc &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_D:
+					m_rd &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_E:
+					m_re &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_H:
+					m_rh &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_L:
+					m_rl &= ~0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_RES_7_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) & ~0x80);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RES), code);
+			}
 		}
 
 		void 
@@ -980,7 +2850,50 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_RET_S:
+					m_pc = m_mmu->read_word(m_sp);
+					m_sp += sizeof(gbw_t);
+					break;
+				case GB_CODE_RET_NZ:
+
+					if(!(m_rf & GB_FLAG_Z)) {
+						m_pc = m_mmu->read_word(m_sp);
+						m_sp += sizeof(gbw_t);
+					}
+
+					break;
+				case GB_CODE_RET_Z:
+
+					if(m_rf & GB_FLAG_Z) {
+						m_pc = m_mmu->read_word(m_sp);
+						m_sp += sizeof(gbw_t);
+					}
+
+					break;
+				case GB_CODE_RET_NC:
+
+					if(!(m_rf & GB_FLAG_C)) {
+						m_pc = m_mmu->read_word(m_sp);
+						m_sp += sizeof(gbw_t);
+					}
+
+					break;
+				case GB_CODE_RET_C:
+
+					if(m_rf & GB_FLAG_C) {
+						m_pc = m_mmu->read_word(m_sp);
+						m_sp += sizeof(gbw_t);
+					}
+
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RET), code);
+			}
+
+			m_last = 2;
 		}
 
 		void 
@@ -988,7 +2901,10 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			m_pc = m_mmu->read_word(m_sp);
+			m_sp += sizeof(gbw_t);
+			m_ime = true;
+			m_last = 2;
 		}
 
 		void 
@@ -996,7 +2912,137 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t carry = (m_rf & GB_FLAG_C) ? 1 : 0, val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_RL_A:
+
+					if(m_ra & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_ra <<= 1;
+					m_ra += carry;
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_B:
+
+					if(m_rb & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rb <<= 1;
+					m_rb += carry;
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_C:
+
+					if(m_rc & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rc <<= 1;
+					m_rc += carry;
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_D:
+
+					if(m_rd & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rd <<= 1;
+					m_rd += carry;
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_E:
+
+					if(m_re & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_re <<= 1;
+					m_re += carry;
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_H:
+
+					if(m_rh & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rh <<= 1;
+					m_rh += carry;
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;		
+				case GB_CODE_RL_L:
+
+					if(m_rl & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rl <<= 1;
+					m_rl += carry;
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RL_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					val <<= 1;
+					val += carry;
+
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RL), code);
+			}
 		}
 
 		void 
@@ -1004,7 +3050,145 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t carry = 0, val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_RLC_A:
+
+					if(m_ra & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_ra <<= 1;
+					m_ra += carry;
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_B:
+
+					if(m_rb & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_rb <<= 1;
+					m_rb += carry;
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_C:
+
+					if(m_rc & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_rc <<= 1;
+					m_rc += carry;
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_D:
+
+					if(m_rd & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_rd <<= 1;
+					m_rd += carry;
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_E:
+
+					if(m_re & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_re <<= 1;
+					m_re += carry;
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_H:
+
+					if(m_rh & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_rh <<= 1;
+					m_rh += carry;
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;		
+				case GB_CODE_RLC_L:
+
+					if(m_rl & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					m_rl <<= 1;
+					m_rl += carry;
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RLC_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 0x80) {
+						m_rf |= GB_FLAG_C;
+						carry = 1;
+					}
+
+					val <<= 1;
+					val += carry;
+
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RLC), code);
+			}
 		}
 
 		void 
@@ -1012,7 +3196,137 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t carry = (m_rf & GB_FLAG_C) ? 0x80 : 0, val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_RR_A:
+
+					if(m_ra & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_ra >>= 1;
+					m_ra += carry;
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_B:
+
+					if(m_rb & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rb >>= 1;
+					m_rb += carry;
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_C:
+
+					if(m_rc & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rc >>= 1;
+					m_rc += carry;
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_D:
+
+					if(m_rd & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rd >>= 1;
+					m_rd += carry;
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_E:
+
+					if(m_re & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_re >>= 1;
+					m_re += carry;
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_H:
+
+					if(m_rh & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rh >>= 1;
+					m_rh += carry;
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;		
+				case GB_CODE_RR_L:
+
+					if(m_rl & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rl >>= 1;
+					m_rl += carry;
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RR_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					val >>= 1;
+					val += carry;
+
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RR), code);
+			}
 		}
 
 		void 
@@ -1020,7 +3334,145 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t carry = 0, val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_RRC_A:
+
+					if(m_ra & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_ra >>= 1;
+					m_ra += carry;
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_B:
+
+					if(m_rb & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_rb >>= 1;
+					m_rb += carry;
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_C:
+
+					if(m_rc & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_rc >>= 1;
+					m_rc += carry;
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_D:
+
+					if(m_rd & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_rd >>= 1;
+					m_rd += carry;
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_E:
+
+					if(m_re & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_re >>= 1;
+					m_re += carry;
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_H:
+
+					if(m_rh & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_rh >>= 1;
+					m_rh += carry;
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;		
+				case GB_CODE_RRC_L:
+
+					if(m_rl & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					m_rl >>= 1;
+					m_rl += carry;
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_RRC_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 1) {
+						m_rf |= GB_FLAG_C;
+						carry = 0x80;
+					}
+
+					val >>= 1;
+					val += carry;
+
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_RRC), code);
+			}
 		}
 
 		void 
@@ -1028,33 +3480,34 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			m_mmu->write_word(m_pc);
+			m_mmu->write_word(m_sp, m_pc);
 			m_pc += sizeof(gbw_t);
+			m_sp -= sizeof(gbw_t);
 
 			switch(code) {
 				case GB_CODE_RST_0:
-					m_pc = 0x0000;
+					m_pc = GB_RST_VEC_0;
 					break;
 				case GB_CODE_RST_8:
-					m_pc = 0x0008;
+					m_pc = GB_RST_VEC_8;
 					break;
 				case GB_CODE_RST_10:
-					m_pc = 0x0010;
+					m_pc = GB_RST_VEC_10;
 					break;
 				case GB_CODE_RST_18:
-					m_pc = 0x0018;
+					m_pc = GB_RST_VEC_18;
 					break;
 				case GB_CODE_RST_20:
-					m_pc = 0x0020;
+					m_pc = GB_RST_VEC_20;
 					break;
 				case GB_CODE_RST_28:
-					m_pc = 0x0028;
+					m_pc = GB_RST_VEC_28;
 					break;
 				case GB_CODE_RST_30:
-					m_pc = 0x0030;
+					m_pc = GB_RST_VEC_30;
 					break;
 				case GB_CODE_RST_38:
-					m_pc = 0x0038;
+					m_pc = GB_RST_VEC_38;
 					break;
 				default:
 					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
@@ -1069,7 +3522,182 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t carry = (m_rf & GB_FLAG_C) ? 1 : 0, res, val;
+
+			m_rf = GB_FLAG_N;
+
+			switch(code) {
+				case GB_CODE_SBC_A_A:
+					val = m_ra + carry;
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_B:
+
+					val = m_rb + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_C:
+
+					val = m_rc + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_D:
+
+					val = m_rd + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_E:
+
+					val = m_re + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_H:
+
+					val = m_rh + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_L:
+
+					val = m_rl + carry;
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SBC_A_HL_INDIRECT:
+					val = m_mmu->read_byte(hl()) + carry;
+
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 2;
+					break;
+				case GB_CODE_SBC_A_N:
+					val = m_mmu->read_byte(m_pc++) + carry;
+
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SBC), code);
+			}
 		}
 
 		void 
@@ -1087,7 +3715,268 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_SET_0_A:
+					m_ra |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_B:
+					m_rb |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_C:
+					m_rc |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_D:
+					m_rd |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_E:
+					m_re |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_H:
+					m_rh |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_L:
+					m_rl |= 0x1;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_0_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x1);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_1_A:
+					m_ra |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_B:
+					m_rb |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_C:
+					m_rc |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_D:
+					m_rd |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_E:
+					m_re |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_H:
+					m_rh |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_L:
+					m_rl |= 0x2;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_1_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x2);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_2_A:
+					m_ra |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_B:
+					m_rb |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_C:
+					m_rc |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_D:
+					m_rd |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_E:
+					m_re |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_H:
+					m_rh |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_L:
+					m_rl |= 0x4;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_2_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x4);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_3_A:
+					m_ra |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_B:
+					m_rb |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_C:
+					m_rc |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_D:
+					m_rd |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_E:
+					m_re |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_H:
+					m_rh |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_L:
+					m_rl |= 0x8;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_3_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x8);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_4_A:
+					m_ra |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_B:
+					m_rb |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_C:
+					m_rc |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_D:
+					m_rd |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_E:
+					m_re |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_H:
+					m_rh |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_L:
+					m_rl |= 0x10;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_4_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x10);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_5_A:
+					m_ra |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_B:
+					m_rb |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_C:
+					m_rc |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_D:
+					m_rd |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_E:
+					m_re |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_H:
+					m_rh |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_L:
+					m_rl |= 0x20;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_5_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x20);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_6_A:
+					m_ra |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_B:
+					m_rb |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_C:
+					m_rc |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_D:
+					m_rd |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_E:
+					m_re |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_H:
+					m_rh |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_L:
+					m_rl |= 0x40;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_6_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x40);
+					m_last = 4;
+					break;
+				case GB_CODE_SET_7_A:
+					m_ra |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_B:
+					m_rb |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_C:
+					m_rc |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_D:
+					m_rd |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_E:
+					m_re |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_H:
+					m_rh |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_L:
+					m_rl |= 0x80;
+					m_last = 2;
+					break;
+				case GB_CODE_SET_7_HL_INDIRECT:
+					m_mmu->write_byte(hl(), m_mmu->read_byte(hl()) | 0x80);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SET), code);
+			}
 		}
 
 		void 
@@ -1095,7 +3984,121 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_SLA_A:
+
+					if(m_ra & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_ra <<= 1;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_B:
+
+					if(m_rb & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rb <<= 1;
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_C:
+
+					if(m_rc & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rc <<= 1;
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_D:
+
+					if(m_rd & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rd <<= 1;
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_E:
+
+					if(m_re & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_re <<= 1;
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_H:
+
+					if(m_rh & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rh <<= 1;
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_L:
+
+					if(m_rl & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rl <<= 1;
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SLA_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 0x80) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					val <<= 1;
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SLA), code);
+			}
 		}
 
 		void 
@@ -1103,7 +4106,153 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_SRA_A:
+
+					if(m_ra & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_ra >>= 1;
+					if(m_ra & 0x40) {
+						m_ra |= 0x80;
+					}
+
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_B:
+
+					if(m_rb & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rb >>= 1;
+					if(m_rb & 0x40) {
+						m_rb |= 0x80;
+					}
+
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_C:
+
+					if(m_rc & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rc >>= 1;
+					if(m_rc & 0x40) {
+						m_rc |= 0x80;
+					}
+
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_D:
+
+					if(m_rd & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rd >>= 1;
+					if(m_rd & 0x40) {
+						m_rd |= 0x80;
+					}
+
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_E:
+
+					if(m_re & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_re >>= 1;
+					if(m_re & 0x40) {
+						m_re |= 0x80;
+					}
+
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_H:
+
+					if(m_rh & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rh >>= 1;
+					if(m_rh & 0x40) {
+						m_rh |= 0x80;
+					}
+
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_L:
+
+					if(m_rl & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rl >>= 1;
+					if(m_rl & 0x40) {
+						m_rl |= 0x80;
+					}
+
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRA_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					val >>= 1;
+					if(val & 0x40) {
+						val |= 0x80;
+					}
+
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SRA), code);
+			}
 		}
 
 		void 
@@ -1111,7 +4260,121 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t val;
+
+			m_rf = 0;
+
+			switch(code) {
+				case GB_CODE_SRL_A:
+
+					if(m_ra & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_ra >>= 1;
+					if(!m_ra) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_B:
+
+					if(m_rb & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rb >>= 1;
+					if(!m_rb) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_C:
+
+					if(m_rc & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rc >>= 1;
+					if(!m_rc) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_D:
+
+					if(m_rd & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rd >>= 1;
+					if(!m_rd) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_E:
+
+					if(m_re & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_re >>= 1;
+					if(!m_re) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_H:
+
+					if(m_rh & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rh >>= 1;
+					if(!m_rh) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_L:
+
+					if(m_rl & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					m_rl >>= 1;
+					if(!m_rl) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_last = 2;
+					break;
+				case GB_CODE_SRL_HL_INDIRECT:
+
+					val = m_mmu->read_byte(hl());
+					if(val & 1) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					val >>= 1;
+					if(!val) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					m_mmu->write_byte(hl(), val);
+					m_last = 4;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SRL), code);
+			}
 		}
 
 		void 
@@ -1128,7 +4391,175 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			gbb_t res, val;
+
+			m_rf = GB_FLAG_N;
+
+			switch(code) {
+				case GB_CODE_SUB_A_A:
+
+					res = m_ra - m_ra;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_ra)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_B:
+
+					if(m_ra < m_rb) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rb;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rb)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_C:
+
+					if(m_ra < m_rc) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rc;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rc)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_D:
+
+					if(m_ra < m_rd) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rd;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rd)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_E:
+
+					if(m_ra < m_re) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_re;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_re)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_H:
+
+					if(m_ra < m_rh) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rh;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rh)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_L:
+
+					if(m_ra < m_rl) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - m_rl;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, m_rl)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 1;
+					break;
+				case GB_CODE_SUB_A_HL_INDIRECT:
+					val = m_mmu->read_byte(hl());
+
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 2;
+					break;
+				case GB_CODE_SUB_A_N:
+					val = m_mmu->read_byte(m_pc++);
+
+					if(m_ra < val) {
+						m_rf |= GB_FLAG_C;
+					}
+
+					res = m_ra - val;
+					if(!res) {
+						m_rf |= GB_FLAG_Z;
+					}
+
+					if(DETERMINE_HALF_CARRY_BYTE(res, m_ra, val)) {
+						m_rf |= GB_FLAG_H;
+					}
+
+					m_ra = res;
+					m_last = 2;
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_SUB), code);
+			}
 		}
 
 		void 
