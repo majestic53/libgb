@@ -63,8 +63,14 @@ namespace GB_NS {
 
 			bool is_initialized(void);
 
+			void run(
+				__in const gb_buf_t &cart
+				);
+
 			std::string to_string(
-				__in_opt bool verb = false
+				__in_opt bool verb = false,
+				__in_opt gb_addr_t addr = 0,
+				__in_opt gbw_t off = 0
 				);
 
 			void uninitialize(void);

@@ -155,7 +155,7 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			gb_cmd_t cmd = GB_CMD_TYPE(GB_CMD_TYPE_EXT, code);
+			gb_cmd_t cmd = GB_CMD_TYPE(GB_CMD_TYPE_SINGLE, code);
 
 			switch(cmd) {
 				case GB_CMD_ADC:
@@ -2431,7 +2431,29 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_LDD_A_HL_INDIRECT:
+					m_ra = m_mmu->read_byte(hl());
+					break;
+				case GB_CODE_LDD_HL_INDIRECT_A:
+					m_mmu->write_byte(hl(), m_ra);
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_LDD), code);
+			}
+
+			if(m_rh) {
+				--m_rh;
+			} else if(m_rl) {
+				--m_rl;
+			} else {
+				m_rh = GBB_MAX_LEN;
+				m_rl = GBB_MAX_LEN;
+			}
+
+			m_last = 2;
 		}
 
 		void 
@@ -2439,7 +2461,20 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_LDH_N_INDIRECT_A:
+					m_mmu->write_byte(m_mmu->read_byte(m_pc++) + 0xff00, m_ra);
+					break;
+				case GB_CODE_LDH_A_N_INDIRECT:
+					m_ra = m_mmu->read_byte(m_mmu->read_byte(m_pc++) + 0xff00);
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_LDH), code);
+			}
+
+			m_last = 3;
 		}
 
 		void 
@@ -2447,7 +2482,23 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+			uint16_t res;
+			int8_t val = m_mmu->read_byte(m_pc++);
+
+			m_rf = 0;
+			
+			if(((val > 0) && ((m_sp + val) > GBW_MAX_LEN))
+					|| ((val < 0) && ((val * -1) > m_sp))) {
+				m_rf |= GB_FLAG_C;
+			}
+
+			res = m_sp + val;
+			if(DETERMINE_HALF_CARRY_WORD(res, m_sp, val)) {
+				m_rf |= GB_FLAG_H;
+			}
+
+			set_hl(res);
+			m_last = 3;
 		}
 
 		void 
@@ -2455,7 +2506,29 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			// TODO
+
+			switch(code) {
+				case GB_CODE_LDI_A_HL_INDIRECT:
+					m_ra = m_mmu->read_byte(hl());
+					break;
+				case GB_CODE_LDI_HL_INDIRECT_A:
+					m_mmu->write_byte(hl(), m_ra);
+					break;
+				default:
+					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,
+						"%s:0x%x", GB_CMD_STRING(GB_CMD_LDI), code);
+			}
+
+			if(m_rl < GBB_MAX_LEN) {
+				++m_rl;
+			} else if(m_rh < GBB_MAX_LEN) {
+				++m_rh;
+			} else {
+				m_rh = 0;
+				m_rl = 0;
+			}
+
+			m_last = 2;
 		}
 
 		void 
@@ -4941,12 +5014,15 @@ namespace GB_NS {
 					<< " (ptr=0x" << VAL_AS_HEX(gb_cpu_ptr, this) << ")";
 
 			if(m_init && verb) {
-				res << std::endl << "--- A: " << VAL_AS_HEX(gbb_t, m_ra) << " (" << VAL_AS_HEX(gbb_t, m_rva)
-					<< "), B: " << VAL_AS_HEX(gbb_t, m_rb) << " (" << VAL_AS_HEX(gbb_t, m_rvb)
-					<< "), C: " << VAL_AS_HEX(gbb_t, m_rc) << " (" << VAL_AS_HEX(gbb_t, m_rvc) 
-					<< "), D: " << VAL_AS_HEX(gbb_t, m_rd) << " (" << VAL_AS_HEX(gbb_t, m_rvd) 
-					<< "), E: " << VAL_AS_HEX(gbb_t, m_re) << " (" << VAL_AS_HEX(gbb_t, m_rve) 
-					<< "), F: " << VAL_AS_HEX(gbb_t, m_rf);
+				res << std::endl << "A=0x" << VAL_AS_HEX(gbb_t, m_ra) << " (A'=0x" << VAL_AS_HEX(gbb_t, m_rva) << ")"
+					<< std::endl<< "B=0x" << VAL_AS_HEX(gbb_t, m_rb) << " (B'=0x" << VAL_AS_HEX(gbb_t, m_rvb) << ")"
+					<< std::endl << "C=0x" << VAL_AS_HEX(gbb_t, m_rc) << " (C'=0x" << VAL_AS_HEX(gbb_t, m_rvc) << ")"
+					<< std::endl << "D=0x" << VAL_AS_HEX(gbb_t, m_rd) << " (D'=0x" << VAL_AS_HEX(gbb_t, m_rvd) << ")" 
+					<< std::endl << "E=0x" << VAL_AS_HEX(gbb_t, m_re) << " (E'=0x" << VAL_AS_HEX(gbb_t, m_rve) << ")";
+
+				res << std::endl << "H=0x" << VAL_AS_HEX(gbb_t, m_rh) << " (H'=0x" << VAL_AS_HEX(gbb_t, m_rvh) << ")"
+					<< std::endl << "L=0x" << VAL_AS_HEX(gbb_t, m_rl) << " (L'=0x" << VAL_AS_HEX(gbb_t, m_rvl) << ")"
+					<< std::endl << "F=0x" << VAL_AS_HEX(gbb_t, m_rf);
 
 				if(m_rf >= GB_FLAG_C) {
 					res << " [";
@@ -4970,7 +5046,7 @@ namespace GB_NS {
 					res << "]";
 				}
 
-				res << " (" << VAL_AS_HEX(gbb_t, m_rvf);
+				res << " (F'=0x" << VAL_AS_HEX(gbb_t, m_rvf);
 
 				if(m_rvf >= GB_FLAG_C) {
 					res << " [";
@@ -4994,11 +5070,10 @@ namespace GB_NS {
 					res << "]";
 				}
 
-				res << "), H: " << VAL_AS_HEX(gbb_t, m_rh) << " (" << VAL_AS_HEX(gbb_t, m_rvh)
-					<< "), L: " << VAL_AS_HEX(gbb_t, m_rl) << " (" << VAL_AS_HEX(gbb_t, m_rvl) << ")"
-					<< std::endl << "--- PC: " << VAL_AS_HEX(gbw_t, m_pc) << ", SP: " 
-					<< VAL_AS_HEX(gbw_t, m_sp) << ", LAST: " << (uint16_t) m_last << ", TOTAL: " << m_tot 
-					<< ", HALT: " << m_halt << ", IME: " << m_ime << ", STOP: " << m_stop;
+				res << ")" << std::endl << "PC=0x" << VAL_AS_HEX(gbw_t, m_pc) << std::endl 
+					<< "SP=0x" << VAL_AS_HEX(gbw_t, m_sp) << std::endl << "LAST=" 
+					<< (uint16_t) m_last << ", TOTAL=" << m_tot << std::endl << "HALT=" 
+					<< m_halt << ", IME=" << m_ime << ", STOP=" << m_stop;
 			}
 
 			return res.str();
