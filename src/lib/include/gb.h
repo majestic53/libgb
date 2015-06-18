@@ -28,7 +28,10 @@
 
 #include "gb_define.h"
 #include "gb_except.h"
+#include "gb_bios.h"
 #include "gb_cmd.h"
+#include "gb_reg.h"
+#include "gb_rom.h"
 
 using namespace GB_NS;
 
@@ -64,7 +67,8 @@ namespace GB_NS {
 			bool is_initialized(void);
 
 			void run(
-				__in const gb_buf_t &cart
+				__in const std::string &in,
+				__in_opt bool path = false
 				);
 
 			std::string to_string(

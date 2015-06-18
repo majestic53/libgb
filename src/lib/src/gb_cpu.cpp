@@ -24,40 +24,6 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
-		#define GB_FLAG_C 0x10
-		#define GB_FLAG_H 0x20
-		#define GB_FLAG_N 0x40
-		#define GB_FLAG_Z 0x80
-		#define GB_INT_HALT_INIT false
-		#define GB_INT_IME_INIT true
-		#define GB_INT_STOP_INIT false
-		#define GB_REG_A_INIT 0x00
-		#define GB_REG_A_ALT_INIT 0x00
-		#define GB_REG_B_INIT 0x00
-		#define GB_REG_B_ALT_INIT 0x00
-		#define GB_REG_C_INIT 0x00
-		#define GB_REG_C_ALT_INIT 0x00
-		#define GB_REG_D_INIT 0x00
-		#define GB_REG_D_ALT_INIT 0x00
-		#define GB_REG_E_INIT 0x00
-		#define GB_REG_E_ALT_INIT 0x00
-		#define GB_REG_F_INIT 0x00
-		#define GB_REG_F_ALT_INIT 0x00
-		#define GB_REG_H_INIT 0x00
-		#define GB_REG_H_ALT_INIT 0x00
-		#define GB_REG_L_INIT 0x00
-		#define GB_REG_L_ALT_INIT 0x00
-		#define GB_REG_PC_INIT 0x0000
-		#define GB_REG_SP_INIT 0x0000
-		#define GB_RST_VEC_0 0x0000
-		#define GB_RST_VEC_8 0x0008
-		#define GB_RST_VEC_10 0x0010
-		#define GB_RST_VEC_18 0x0018
-		#define GB_RST_VEC_20 0x0020
-		#define GB_RST_VEC_28 0x0028
-		#define GB_RST_VEC_30 0x0030
-		#define GB_RST_VEC_38 0x0038
-
 		#define DETERMINE_HALF_CARRY(_A_, _B_) \
 			(((_A_) ^ (_B_)) & (UINT4_MAX + 1))
 		#define _DETERMINE_HALF_CARRY(_RES_, _A_, _B_, _LEN_) \
@@ -3559,28 +3525,28 @@ namespace GB_NS {
 
 			switch(code) {
 				case GB_CODE_RST_0:
-					m_pc = GB_RST_VEC_0;
+					m_pc = GB_REG_RST_VEC_0;
 					break;
 				case GB_CODE_RST_8:
-					m_pc = GB_RST_VEC_8;
+					m_pc = GB_REG_RST_VEC_8;
 					break;
 				case GB_CODE_RST_10:
-					m_pc = GB_RST_VEC_10;
+					m_pc = GB_REG_RST_VEC_10;
 					break;
 				case GB_CODE_RST_18:
-					m_pc = GB_RST_VEC_18;
+					m_pc = GB_REG_RST_VEC_18;
 					break;
 				case GB_CODE_RST_20:
-					m_pc = GB_RST_VEC_20;
+					m_pc = GB_REG_RST_VEC_20;
 					break;
 				case GB_CODE_RST_28:
-					m_pc = GB_RST_VEC_28;
+					m_pc = GB_REG_RST_VEC_28;
 					break;
 				case GB_CODE_RST_30:
-					m_pc = GB_RST_VEC_30;
+					m_pc = GB_REG_RST_VEC_30;
 					break;
 				case GB_CODE_RST_38:
-					m_pc = GB_RST_VEC_38;
+					m_pc = GB_REG_RST_VEC_38;
 					break;
 				default:
 					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CODE,

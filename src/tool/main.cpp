@@ -19,36 +19,13 @@
 
 #include "../lib/include/gb.h"
 
-// TODO: DEBUG
-/*
-org $0000
-init:
-	set 3, c	; cb d9
-	jp test		; c3 10 00
-org $0010
-test:
-	ld a, $01	; 3e 01
-	ld b, $0f	; 06 0f
-	add a, b	; 80
-	halt		; 76
- */
-
-static const gb_buf_t test = { 
-	0xcb, 0xd9, 0xc3, 0x10, 0x00, 0x00, 0x00, 0x00, 
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
-	0x3e, 0x01, 0x06, 0x0f, 0x80, 0x76, 
-};
-
-#define TEST_CMD_COUNT 6
-// ---
+#define TEST_PATH "./test/test.gb"
 
 int 
 main(void) 
 {
+	int res = 0;
 	gb_ptr inst = NULL;
-	int iter = 0, res = 0;
-	gb_cpu_ptr cpu_inst = NULL;
-	gb_mmu_ptr mmu_inst = NULL;
 
 	std::cout << gb::version(true) << std::endl << "----------------------" 
 		<< std::endl;
@@ -58,17 +35,7 @@ main(void)
 		inst->initialize();
 
 		// TODO: DEBUG
-		cpu_inst = inst->acquire_cpu();
-		mmu_inst = inst->acquire_mmu();
-
-		cpu_inst->reset();
-		mmu_inst->insert(0x0000, test);
-
-		for(; iter < TEST_CMD_COUNT; ++iter) {
-			cpu_inst->step();
-		}
-		
-		std::cout << inst->to_string(true, 0x0000, test.size()) << std::endl;
+		inst->run(TEST_PATH, true);
 		// ---
 
 		inst->uninitialize();

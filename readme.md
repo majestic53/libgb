@@ -15,6 +15,12 @@ Changelog
 =========
 
 ###Version 0.1.1525
+*Updated: 6/17/2015*
+
+* Added rom class
+* Added special register definitions
+* Added bios definition
+
 *Updated: 6/16/2015*
 
 * Added cpu command helper routines (complete)

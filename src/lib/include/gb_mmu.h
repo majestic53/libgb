@@ -23,13 +23,7 @@
 namespace GB_NS {
 
 	namespace GB_COMP_NS {
-	
-		#define GB_MMU_MAX_ADDR GBW_MAX_LEN
 
-		typedef uint16_t gb_addr_t;
-	
-		typedef std::vector<gbb_t> gb_buf_t;
-	
 		typedef class _gb_mmu {
 		
 			public:

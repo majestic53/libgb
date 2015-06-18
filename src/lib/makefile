@@ -28,17 +28,20 @@ all: build archive
 archive:
 	@echo ""
 	@echo "--- BUILDING LIBRARY -----------------------"
-	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)gb.o $(DIR_BUILD)gb_cpu.o $(DIR_BUILD)gb_except.o $(DIR_BUILD)gb_mmu.o
+	ar rcs $(DIR_BUILD)$(LIB) $(DIR_BUILD)gb.o $(DIR_BUILD)gb_cpu.o $(DIR_BUILD)gb_except.o $(DIR_BUILD)gb_mmu.o $(DIR_BUILD)gb_rom.o
 	@echo "--- DONE -----------------------------------"
 	@echo ""
 
-build: gb.o gb_cpu.o gb_except.o gb_mmu.o
+build: gb.o gb_cpu.o gb_except.o gb_mmu.o gb_rom.o
 
 gb.o: $(DIR_SRC)gb.cpp $(DIR_INC)gb.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)gb.cpp -o $(DIR_BUILD)gb.o
 
 gb_except.o: $(DIR_SRC)gb_except.cpp $(DIR_INC)gb_except.h
 	$(CC) $(CC_FLAGS) -c $(DIR_SRC)gb_except.cpp -o $(DIR_BUILD)gb_except.o
+
+gb_rom.o: $(DIR_SRC)gb_rom.cpp $(DIR_INC)gb_rom.h
+	$(CC) $(CC_FLAGS) -c $(DIR_SRC)gb_rom.cpp -o $(DIR_BUILD)gb_rom.o
 
 # COMPONENTS
 

@@ -38,16 +38,18 @@ namespace GB_NS {
 	#define __inout
 	#define __inout_opt
 
-	#define GCD_MAX 9
 	#define BLD_INFO "Copyright (C) 2015 David Jolly"
 	#define BLD_NAME "LIBGB"
 	#define BLD_VER_MAJ 0
 	#define BLD_VER_MIN 1
-	#define BLD_VER_REV 2
+	#define BLD_VER_REV 3
 	#define BLD_VER_WEEK 1525
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8
 	#define BITS_PER_NIBBLE 4
+	#define BYTES_PER_KBYTE (1024.0)
+	#define GCD_MAX 9
+	#define EMPTY "EMPTY"
 	#define UINT4_MAX 0xf
 	#define UNKNOWN "UNKNOWN"
 	#define VER_STR \
@@ -55,6 +57,9 @@ namespace GB_NS {
 		CAT_STR(BLD_VER_WEEK) "." CAT_STR(BLD_VER_REV)
 	#define VER_VERB_STR \
 		BLD_NAME " " VER_STR "\n" BLD_INFO
+
+	#define CHK_STR(_STR_) \
+		((_STR_).empty() ? EMPTY : (_STR_).c_str())
 
 	#define _CAT_STR(_STR_) # _STR_
 	#define CAT_STR(_STR_) _CAT_STR(_STR_)
@@ -78,6 +83,12 @@ namespace GB_NS {
 	#define GBDW_MAX_LEN UINT32_MAX
 
 	typedef uint32_t gbdw_t;
+
+	#define GB_MMU_MAX_ADDR GBW_MAX_LEN
+
+	typedef uint16_t gb_addr_t;
+
+	typedef std::vector<gbb_t> gb_buf_t;
 }
 
 #endif // GB_DEFINE_H_
