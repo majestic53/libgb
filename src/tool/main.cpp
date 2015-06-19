@@ -35,7 +35,8 @@ main(void)
 		inst->initialize();
 
 		// TODO: DEBUG
-		inst->run(TEST_PATH, true);
+		std::cout << inst->to_string(true) << std::endl;		
+		//inst->run(TEST_PATH, true);
 		// ---
 
 		inst->uninitialize();

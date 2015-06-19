@@ -37,6 +37,7 @@ namespace GB_NS {
 
 		_gb_cpu::_gb_cpu(void) :
 			m_init(false),
+			m_gpu(gb_gpu::acquire()),
 			m_mmu(gb_mmu::acquire()),
 			m_ra(GB_REG_A_INIT),
 			m_rb(GB_REG_B_INIT),
@@ -4919,6 +4920,7 @@ namespace GB_NS {
 				execute(code);
 			}
 
+			m_gpu->step(m_last);
 			m_tot += m_last;
 
 			return m_last;

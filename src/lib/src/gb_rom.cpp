@@ -163,8 +163,7 @@ namespace GB_NS {
 		gbw_t res;
 		gb_addr_t off = GB_ROM_ADDR_CHKSUM;
 
-		if((off >= m_buf.size())
-				|| ((off + 1) >= m_buf.size())) {
+		if((off + 1) >= m_buf.size()) {
 			THROW_GB_ROM_EXCEPTION_MESSAGE(GB_ROM_EXCEPTION_INVALID_ROM_OFFSET,
 				"off=0x%04x-0x%04x", off, off + 1);
 		}
@@ -261,8 +260,7 @@ namespace GB_NS {
 		gbb_t res;
 		gb_addr_t off = GB_ROM_ADDR_LIC;
 
-		if((off >= m_buf.size())
-				|| ((off + 1) >= m_buf.size())) {
+		if((off + 1) >= m_buf.size()) {
 			THROW_GB_ROM_EXCEPTION_MESSAGE(GB_ROM_EXCEPTION_INVALID_ROM_OFFSET,
 				"off=0x%04x-0x%04x", off, off + 1);
 		}

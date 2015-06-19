@@ -15,6 +15,10 @@ Changelog
 =========
 
 ###Version 0.1.1525
+*Updated: 6/18/2015*
+
+* Added gpu class
+
 *Updated: 6/17/2015*
 
 * Added rom class

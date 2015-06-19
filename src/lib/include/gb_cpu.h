@@ -284,6 +284,8 @@ namespace GB_NS {
 
 				static _gb_cpu *m_inst;
 
+				gb_gpu_ptr m_gpu;
+
 				gb_mmu_ptr m_mmu;
 
 			private:
