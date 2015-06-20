@@ -4833,6 +4833,12 @@ namespace GB_NS {
 			return m_stop;
 		}
 
+		bool 
+		_gb_cpu::is_zero_page(void)
+		{
+			return (m_pc <= GBB_MAX_LEN);
+		}
+
 		void 
 		_gb_cpu::reset(void)
 		{
@@ -4914,13 +4920,17 @@ namespace GB_NS {
 		}
 
 		void 
-		_gb_cpu::start(void)
+		_gb_cpu::start(
+			__in_opt const std::string &title,
+			__in_opt bool detach
+			)
 		{
 
 			if(!m_stop) {
 				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_INVALID_STATE);
 			}
 
+			m_gpu->start(title, detach);
 			m_stop = false;
 		}
 
@@ -4955,6 +4965,7 @@ namespace GB_NS {
 				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_INVALID_STATE);
 			}
 
+			m_gpu->stop();
 			m_stop = true;
 		}
 

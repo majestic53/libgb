@@ -36,8 +36,8 @@ namespace GB_NS {
 			GB_GPU_EXCEPTION_ACTIVE = 0,
 			GB_GPU_EXCEPTION_ALLOC_FAILED,
 			GB_GPU_EXCPETION_INACTIVE,
+			GB_GPU_EXCEPTION_INTERNAL,
 			GB_GPU_EXCEPTION_INITIALIZED,
-			GB_GPU_EXCEPTION_INVALID_PARAM,
 			GB_GPU_EXCEPTION_UNINITIALIZED,
 			GB_GPU_EXCEPTION_UNKNOWN_STATE,
 		};
@@ -48,8 +48,8 @@ namespace GB_NS {
 			GB_GPU_EXCEPTION_HEADER " Component is already active",
 			GB_GPU_EXCEPTION_HEADER " Failed to allocate component",
 			GB_GPU_EXCEPTION_HEADER " Component is inactive", 
+			GB_GPU_EXCEPTION_HEADER " Internal exception",
 			GB_GPU_EXCEPTION_HEADER " Component is already initialized",
-			GB_GPU_EXCEPTION_HEADER " Invalid component parameter",
 			GB_GPU_EXCEPTION_HEADER " Component is uninitialized",
 			GB_GPU_EXCEPTION_HEADER " Unknown state",
 			};

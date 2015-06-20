@@ -29,7 +29,7 @@ namespace GB_NS {
 
 	#define GB_INT_HALT_INIT false
 	#define GB_INT_IME_INIT true
-	#define GB_INT_STOP_INIT false
+	#define GB_INT_STOP_INIT true
 
 	#define GB_REG_A_INIT 0
 	#define GB_REG_A_ALT_INIT 0

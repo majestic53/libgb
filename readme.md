@@ -15,6 +15,11 @@ Changelog
 =========
 
 ###Version 0.1.1525
+*Updated: 6/20/2015*
+
+* GLFW window support (partial)
+* GLFW keyboard support (partial)
+
 *Updated: 6/19/2015*
 
 * Opengl window integration (partial)

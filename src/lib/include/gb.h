@@ -30,6 +30,7 @@
 #include "gb_except.h"
 #include "gb_bios.h"
 #include "gb_cmd.h"
+#include "gb_key.h"
 #include "gb_reg.h"
 #include "gb_rom.h"
 

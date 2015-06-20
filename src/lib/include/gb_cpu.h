@@ -46,11 +46,16 @@ namespace GB_NS {
 
 				bool is_stopped(void);
 
+				bool is_zero_page(void);
+
 				void reset(void);
 
 				void resume(void);
 
-				void start(void);
+				void start(
+					__in_opt const std::string &title = std::string(),
+					__in_opt bool detach = true
+					);
 
 				gbb_t step(void);
 

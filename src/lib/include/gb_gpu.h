@@ -41,10 +41,6 @@ namespace GB_NS {
 
 				static void _delete(void);
 
-				static void _graphics(
-					__in _gb_gpu *gpu
-					);
-
 				static _gb_gpu *acquire(void);
 
 				void initialize(void);
@@ -59,7 +55,7 @@ namespace GB_NS {
 
 				void start(
 					__in_opt const std::string &title = std::string(),
-					__in_opt bool detach = false
+					__in_opt bool detach = true
 					);
 
 				void step(
@@ -86,23 +82,48 @@ namespace GB_NS {
 					__in const _gb_gpu &other
 					);
 
+				static void graphics(void);
+
+				static void graphics_close(
+					__in GLFWwindow *win
+					);
+
+				static void graphics_error(
+					__in int code,
+					__in const char *desc
+					);
+
+				static void graphics_key(
+					__in GLFWwindow *win, 
+					__in int key, 
+					__in int code, 
+					__in int action, 
+					__in int mods
+					);
+
+				static void graphics_update(
+					__in GLFWwindow *win
+					);
+
 				bool m_init;
 
 				static _gb_gpu *m_inst;
+
+				static bool m_active, m_update;
+
+				static gb_buf_t m_buf;
+
+				static gbb_t m_line;
+
+				static std::string m_title;
 
 				gb_mmu_ptr m_mmu;
 
 			private:
 
-				bool m_active, m_update;
-
-				gb_buf_t m_buf;
-
 				std::thread m_graphics_thread;
 
-				gbb_t m_line;
-
-				gb_gpu_st_t m_state;				
+				gb_gpu_st_t m_state;
 
 				uint32_t m_tot;
 

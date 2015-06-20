@@ -32,6 +32,7 @@ namespace GB_NS {
 		#define GB_GPU_VLINE_LEN 160
 		#define GB_GPU_VLINE_MAX (GB_GPU_VLINE_LEN - 1)
 		#define GB_GPU_VRAM_CLK 172
+		#define GB_SWAP_INTERVAL 1
 
 		static const std::string GB_GPU_STATE_STR[] = {
 			"HBLANK", "VBLANK", "OAM", "VRAM",
@@ -41,14 +42,16 @@ namespace GB_NS {
 			((_TYPE_) > GB_GPU_STATE_MAX ? UNKNOWN : \
 			GB_GPU_STATE_STR[_TYPE_].c_str())
 
+		bool gb_gpu::m_active = false;
+		bool gb_gpu::m_update = false;
+		gb_buf_t gb_gpu::m_buf = gb_buf_t();
+		gbb_t gb_gpu::m_line = 0;
+		std::string gb_gpu::m_title(EMPTY);
 		gb_gpu_ptr gb_gpu::m_inst = NULL;
 
 		_gb_gpu::_gb_gpu(void) :			
 			m_init(false),
 			m_mmu(gb_mmu::acquire()),
-			m_active(false),
-			m_update(false),
-			m_line(0),
 			m_state(GB_GPU_STATE_HBLNK),
 			m_tot(0)
 		{
@@ -78,28 +81,6 @@ namespace GB_NS {
 			}
 		}
 
-		void 
-		_gb_gpu::_graphics(
-			__in _gb_gpu *gpu
-			)
-		{
-
-			if(!gpu) {
-				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_INVALID_PARAM);
-			}
-
-			while(gpu->m_active) {
-
-				if(m_update) {
-					m_update = false;
-
-					// TODO: render m_buf to opengl thread
-				} else {
-					// TODO: wait
-				}
-			}
-		}
-
 		gb_gpu_ptr 
 		_gb_gpu::acquire(void)
 		{
@@ -113,6 +94,146 @@ namespace GB_NS {
 			}
 
 			return gb_gpu::m_inst;
+		}
+
+		void 
+		_gb_gpu::graphics(void)
+		{
+			GLFWwindow *win = NULL;
+			const GLFWvidmode *mode = NULL;
+
+			glfwSetErrorCallback(graphics_error);
+
+			if(!glfwInit()) {
+				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, "%s", 
+					CAT_STR(glfwInit));
+			}
+
+			win = glfwCreateWindow(GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, CHK_STR(gb_gpu::m_title), 
+				NULL, NULL);
+
+			if(!win) {
+				glfwTerminate();
+				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, "%s", 
+					CAT_STR(glfwCreateWindow));
+			}
+
+			mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+			glfwSetWindowPos(win, (mode->width - GB_GPU_VLINE_LEN) / 2,
+				(mode->height - GB_GPU_HLINE_LEN) / 2);
+
+			glfwMakeContextCurrent(win);
+			glfwSwapInterval(GB_SWAP_INTERVAL);
+			glfwSetWindowCloseCallback(win, graphics_close);
+			glfwSetKeyCallback(win, graphics_key);
+
+			while(!glfwWindowShouldClose(win)) {
+
+				if(!gb_gpu::m_active) {
+					break;
+				}
+
+				graphics_update(win);
+				glfwSwapBuffers(win);
+				glfwPollEvents();
+			}
+
+			if(gb_gpu::m_active) {
+				gb::acquire()->acquire_cpu()->stop();
+			}
+
+			glfwDestroyWindow(win);
+			glfwTerminate();
+		}
+
+		void 
+		_gb_gpu::graphics_close(
+			__in GLFWwindow *win
+			)
+		{
+			gb::acquire()->acquire_cpu()->stop();
+		}
+
+		void 
+		_gb_gpu::graphics_error(
+			__in int code,
+			__in const char *desc
+			)
+		{
+			THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL,
+				"(0x%x) %s", code, desc ? desc : EMPTY);
+		}
+
+		void 
+		_gb_gpu::graphics_update(
+			__in GLFWwindow *win
+			)
+		{
+			float ratio;
+			int height, width;
+
+			//if(gb_gpu::m_update) {
+			//	gb_gpu::m_update = false;
+
+				// TODO: draw m_buf to win
+				glfwGetFramebufferSize(win, &width, &height);
+				ratio = width / (float) height;
+				glViewport(0, 0, width, height);
+				glClear(GL_COLOR_BUFFER_BIT);
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+				glMatrixMode(GL_MODELVIEW);
+				glLoadIdentity();
+				glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
+				glBegin(GL_TRIANGLES);
+				glColor3f(1.f, 0.f, 0.f);
+				glVertex3f(-0.6f, -0.4f, 0.f);
+				glColor3f(0.f, 1.f, 0.f);
+				glVertex3f(0.6f, -0.4f, 0.f);
+				glColor3f(0.f, 0.f, 1.f);
+				glVertex3f(0.f, 0.6f, 0.f);
+				glEnd();
+				// ---
+			//}
+		}
+
+		void 
+		_gb_gpu::graphics_key(
+			__in GLFWwindow *win, 
+			__in int key, 
+			__in int code, 
+			__in int action, 
+			__in int mods
+			)
+		{
+			// TODO: set the appropriate mmu registers based on key press
+
+			switch(key) {
+
+				case GB_KEY_A:
+					break;
+				case GB_KEY_B:
+					break;
+				case GB_KEY_DOWN:
+					break;
+				case GB_KEY_ESCAPE:
+
+					if(action == GLFW_RELEASE) {
+						glfwSetWindowShouldClose(win, GL_TRUE);
+					}
+					break;
+				case GB_KEY_LEFT:
+					break;
+				case GB_KEY_RIGHT:
+					break;
+				case GB_KEY_SELECT:
+					break;
+				case GB_KEY_START:
+					break;
+				case GB_KEY_UP:
+					break;
+			}
 		}
 
 		void 
@@ -160,6 +281,7 @@ namespace GB_NS {
 			m_buf.clear();
 			m_line = 0;
 			m_state = GB_GPU_STATE_HBLNK;
+			m_title.clear();
 			m_tot = 0;
 		}
 
@@ -178,8 +300,9 @@ namespace GB_NS {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_ACTIVE);
 			}
 
+			m_title = title;
 			m_buf.resize(GB_GPU_VLINE_LEN * GB_GPU_HLINE_LEN);
-			m_graphics_thread = std::thread(gb_gpu::_graphics, this);
+			m_graphics_thread = std::thread(gb_gpu::graphics);
 
 			if(detach) {
 				m_graphics_thread.detach();

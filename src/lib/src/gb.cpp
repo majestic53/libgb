@@ -164,22 +164,35 @@ namespace GB_NS {
 		__in_opt bool path
 		)
 	{
+		bool bios = true;
 		gb_rom rom(in, path);
 
 		if(!m_init) {
 			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_UNINITIALIZED);
 		}
 
-		// TODO: DEBUG
-		std::cout << rom.to_string(true) << std::endl;
-		m_inst_gpu->start(rom.title());
-		std::cin.get();
-		m_inst_gpu->stop();
-		// ---
+		m_inst_cpu->start(rom.title());
 
-		// TODO: startup
-		// TODO: run cart in loop (sync tick between components, checking for stop/halt/etc.)
-		// TODO: cleanup
+		// TODO: startup; load bios
+
+		while(!m_inst_cpu->is_stopped()) {
+
+			if(bios && !m_inst_cpu->is_zero_page()) {
+				bios = false;
+
+				// TODO: remove BIOS from zero page and replace with rom contents
+
+			} else if(m_inst_cpu->is_halted()) {
+
+				// TODO: check mmu interrupt register and then call resume
+
+			} else {
+
+				// TODO: step CPU here
+				usleep(1000);
+				// ---
+			}
+		}
 	}
 
 	std::string 
