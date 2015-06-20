@@ -1571,11 +1571,10 @@ namespace GB_NS {
 		{
 			gbb_t orig, tmp;
 
-			m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
-			m_rf |= GB_FLAG_N;
-
 			switch(code) {
 				case GB_CODE_DEC_A:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_ra;
 					--m_ra;
 
@@ -1590,6 +1589,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_B:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_rb;
 					--m_rb;
 
@@ -1604,6 +1605,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_C:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_rc;
 					--m_rc;
 
@@ -1618,6 +1621,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_D:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_rd;
 					--m_rd;
 
@@ -1632,6 +1637,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_E:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_re;
 					--m_re;
 
@@ -1646,6 +1653,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_H:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_rh;
 					--m_rh;
 
@@ -1660,6 +1669,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_L:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_rl;
 					--m_rl;
 
@@ -1674,6 +1685,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_DEC_HL_INDIRECT:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
+					m_rf |= GB_FLAG_N;
 					orig = m_mmu->read_byte(hl());
 					tmp = orig;
 					--orig;
@@ -1774,6 +1787,7 @@ namespace GB_NS {
 
 			switch(code) {
 				case GB_CODE_INC_A:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_ra;
 					++m_ra;
 
@@ -1788,6 +1802,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_INC_B:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_rb;
 					++m_rb;
 
@@ -1802,6 +1817,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_INC_C:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_rc;
 					++m_rc;
 
@@ -1816,6 +1832,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;		
 				case GB_CODE_INC_D:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_rd;
 					++m_rd;
 
@@ -1830,6 +1847,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_INC_E:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_re;
 					++m_re;
 
@@ -1844,6 +1862,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;		
 				case GB_CODE_INC_H:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_rh;
 					++m_rh;
 
@@ -1858,6 +1877,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_INC_L:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_rl;
 					++m_rl;
 
@@ -1872,6 +1892,7 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_INC_HL_INDIRECT:
+					m_rf &= ~(GB_FLAG_H | GB_FLAG_N | GB_FLAG_Z);
 					orig = m_mmu->read_byte(hl());
 					tmp = orig;
 					++orig;

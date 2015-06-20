@@ -166,7 +166,16 @@ namespace GB_NS {
 	{
 		gb_rom rom(in, path);
 
+		if(!m_init) {
+			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_UNINITIALIZED);
+		}
+
+		// TODO: DEBUG
 		std::cout << rom.to_string(true) << std::endl;
+		m_inst_gpu->start(rom.title());
+		std::cin.get();
+		m_inst_gpu->stop();
+		// ---
 
 		// TODO: startup
 		// TODO: run cart in loop (sync tick between components, checking for stop/halt/etc.)

@@ -15,6 +15,11 @@ Changelog
 =========
 
 ###Version 0.1.1525
+*Updated: 6/19/2015*
+
+* Opengl window integration (partial)
+* Minor bug fix in cpu class
+
 *Updated: 6/18/2015*
 
 * Added gpu class

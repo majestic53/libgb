@@ -27,6 +27,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <thread>
 #include <vector>
 
 namespace GB_NS {
@@ -42,7 +43,7 @@ namespace GB_NS {
 	#define BLD_NAME "LIBGB"
 	#define BLD_VER_MAJ 0
 	#define BLD_VER_MIN 1
-	#define BLD_VER_REV 4
+	#define BLD_VER_REV 5
 	#define BLD_VER_WEEK 1525
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8

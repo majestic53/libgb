@@ -47,6 +47,7 @@ namespace GB_NS {
 			m_init(false),
 			m_mmu(gb_mmu::acquire()),
 			m_active(false),
+			m_update(false),
 			m_line(0),
 			m_state(GB_GPU_STATE_HBLNK),
 			m_tot(0)
@@ -74,6 +75,28 @@ namespace GB_NS {
 			if(gb_gpu::m_inst) {
 				delete gb_gpu::m_inst;
 				gb_gpu::m_inst = NULL;
+			}
+		}
+
+		void 
+		_gb_gpu::_graphics(
+			__in _gb_gpu *gpu
+			)
+		{
+
+			if(!gpu) {
+				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_INVALID_PARAM);
+			}
+
+			while(gpu->m_active) {
+
+				if(m_update) {
+					m_update = false;
+
+					// TODO: render m_buf to opengl thread
+				} else {
+					// TODO: wait
+				}
 			}
 		}
 
@@ -133,6 +156,7 @@ namespace GB_NS {
 			}
 
 			m_active = false;
+			m_update = false;
 			m_buf.clear();
 			m_line = 0;
 			m_state = GB_GPU_STATE_HBLNK;
@@ -141,7 +165,8 @@ namespace GB_NS {
 
 		void 
 		_gb_gpu::start(
-			__in_opt const std::string &title
+			__in_opt const std::string &title,
+			__in_opt bool detach
 			)
 		{
 
@@ -154,8 +179,11 @@ namespace GB_NS {
 			}
 
 			m_buf.resize(GB_GPU_VLINE_LEN * GB_GPU_HLINE_LEN);
+			m_graphics_thread = std::thread(gb_gpu::_graphics, this);
 
-			// TODO: start opengl thread
+			if(detach) {
+				m_graphics_thread.detach();
+			}
 
 			m_active = true;
 		}
@@ -182,7 +210,7 @@ namespace GB_NS {
 							m_state = GB_GPU_STATE_VBLNK;
 
 							if(m_active) {
-								// TODO: render m_buf to opengl thread
+								m_update = true;
 							}
 						} else {
 							m_state = GB_GPU_STATE_OAM;
@@ -235,10 +263,13 @@ namespace GB_NS {
 			if(!m_active) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCPETION_INACTIVE);
 			}
-
-			// TODO: kill opengl thread
 			
 			m_active = false;
+
+			if(m_graphics_thread.joinable()) {
+				m_graphics_thread.join();
+			}
+
 			m_buf.clear();
 		}
 

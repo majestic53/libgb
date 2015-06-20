@@ -41,6 +41,10 @@ namespace GB_NS {
 
 				static void _delete(void);
 
+				static void _graphics(
+					__in _gb_gpu *gpu
+					);
+
 				static _gb_gpu *acquire(void);
 
 				void initialize(void);
@@ -54,7 +58,8 @@ namespace GB_NS {
 				void reset(void);
 
 				void start(
-					__in_opt const std::string &title = std::string()
+					__in_opt const std::string &title = std::string(),
+					__in_opt bool detach = false
 					);
 
 				void step(
@@ -89,13 +94,15 @@ namespace GB_NS {
 
 			private:
 
-				bool m_active;
+				bool m_active, m_update;
 
 				gb_buf_t m_buf;
 
+				std::thread m_graphics_thread;
+
 				gbb_t m_line;
 
-				gb_gpu_st_t m_state;
+				gb_gpu_st_t m_state;				
 
 				uint32_t m_tot;
 
