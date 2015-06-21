@@ -28,6 +28,7 @@ namespace GB_NS {
 		m_init(false),
 		m_inst_cpu(gb_cpu::acquire()),
 		m_inst_gpu(gb_gpu::acquire()),
+		m_inst_joy(gb_joy::acquire()),
 		m_inst_mmu(gb_mmu::acquire())
 	{
 		std::atexit(gb::_delete);
@@ -40,6 +41,7 @@ namespace GB_NS {
 			release_cpu();
 			release_gpu();
 			release_mmu();
+			release_joy();
 			uninitialize();
 		}
 	}
@@ -91,6 +93,17 @@ namespace GB_NS {
 		return m_inst_gpu;
 	}
 
+	gb_joy_ptr 
+	_gb::acquire_joy(void)
+	{
+
+		if(!m_inst_joy) {
+			m_inst_joy = gb_joy::acquire();
+		}
+
+		return m_inst_joy;
+	}
+
 	gb_mmu_ptr 
 	_gb::acquire_mmu(void)
 	{
@@ -110,6 +123,7 @@ namespace GB_NS {
 			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_INITIALIZED);
 		}
 
+		m_inst_joy->initialize();
 		m_inst_mmu->initialize();
 		m_inst_gpu->initialize();
 		m_inst_cpu->initialize();
@@ -145,6 +159,16 @@ namespace GB_NS {
 		if(gb_gpu::is_allocated()) {
 			gb_gpu::_delete();
 			m_inst_gpu = NULL;
+		}
+	}
+
+	void 
+	_gb::release_joy(void)
+	{
+
+		if(gb_joy::is_allocated()) {
+			gb_joy::_delete();
+			m_inst_joy = NULL;
 		}
 	}
 
@@ -208,6 +232,7 @@ namespace GB_NS {
 			<< " (ptr=0x" << VAL_AS_HEX(gb_ptr, this) << ")"
 			<< std::endl << "--- " << m_inst_cpu->to_string(verb)
 			<< std::endl << "--- " << m_inst_gpu->to_string(verb)
+			<< std::endl << "--- " << m_inst_joy->to_string(verb)
 			<< std::endl << "--- " << m_inst_mmu->to_string(verb, addr, off);
 
 		return res.str();
@@ -224,6 +249,7 @@ namespace GB_NS {
 		m_inst_cpu->uninitialize();
 		m_inst_gpu->uninitialize();
 		m_inst_mmu->uninitialize();
+		m_inst_joy->uninitialize();
 		m_init = false;
 	}
 

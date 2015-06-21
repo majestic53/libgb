@@ -117,7 +117,7 @@ namespace GB_NS {
 
 				static std::string m_title;
 
-				gb_mmu_ptr m_mmu;
+				static gb_mmu_ptr m_mmu;
 
 			private:
 

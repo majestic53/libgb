@@ -47,11 +47,11 @@ namespace GB_NS {
 		gb_buf_t gb_gpu::m_buf = gb_buf_t();
 		gbb_t gb_gpu::m_line = 0;
 		std::string gb_gpu::m_title(EMPTY);
+		gb_mmu_ptr gb_gpu::m_mmu = gb_mmu::acquire();
 		gb_gpu_ptr gb_gpu::m_inst = NULL;
 
 		_gb_gpu::_gb_gpu(void) :			
 			m_init(false),
-			m_mmu(gb_mmu::acquire()),
 			m_state(GB_GPU_STATE_HBLNK),
 			m_tot(0)
 		{
@@ -207,15 +207,41 @@ namespace GB_NS {
 			__in int mods
 			)
 		{
-			// TODO: set the appropriate mmu registers based on key press
 
 			switch(key) {
 
 				case GB_KEY_A:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_action_a();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_action_a();
+							break;
+					}
 					break;
 				case GB_KEY_B:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_action_b();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_action_b();
+							break;
+					}
 					break;
 				case GB_KEY_DOWN:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_direction_down();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_direction_down();
+							break;
+					}
 					break;
 				case GB_KEY_ESCAPE:
 
@@ -224,14 +250,59 @@ namespace GB_NS {
 					}
 					break;
 				case GB_KEY_LEFT:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_direction_left();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_direction_left();
+							break;
+					}
 					break;
 				case GB_KEY_RIGHT:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_direction_right();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_direction_right();
+							break;
+					}
 					break;
 				case GB_KEY_SELECT:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_action_select();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_action_select();
+							break;
+					}
 					break;
 				case GB_KEY_START:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_action_start();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_action_start();
+							break;
+					}
 					break;
 				case GB_KEY_UP:
+
+					switch(action) {
+						case GLFW_PRESS:
+							m_mmu->_joystick()->set_direction_up();
+							break;
+						case GLFW_RELEASE:
+							m_mmu->_joystick()->clear_direction_up();
+							break;
+					}
 					break;
 			}
 		}

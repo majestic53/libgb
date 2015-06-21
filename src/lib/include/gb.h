@@ -40,6 +40,7 @@ using namespace GB_NS;
 #define GB_COMP_NS gb_comp
 #endif // GB_COMP_NS
 
+#include "gb_joy.h"
 #include "gb_mmu.h"
 #include "gb_gpu.h"
 #include "gb_cpu.h"
@@ -61,6 +62,8 @@ namespace GB_NS {
 			gb_cpu_ptr acquire_cpu(void);
 
 			gb_gpu_ptr acquire_gpu(void);
+
+			gb_joy_ptr acquire_joy(void);
 
 			gb_mmu_ptr acquire_mmu(void);
 
@@ -103,6 +106,8 @@ namespace GB_NS {
 
 			void release_gpu(void);
 
+			void release_joy(void);
+
 			void release_mmu(void);
 
 			bool m_init;
@@ -112,6 +117,8 @@ namespace GB_NS {
 			gb_cpu_ptr m_inst_cpu;
 
 			gb_gpu_ptr m_inst_gpu;
+
+			gb_joy_ptr m_inst_joy;
 
 			gb_mmu_ptr m_inst_mmu;
 

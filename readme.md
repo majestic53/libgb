@@ -17,6 +17,7 @@ Changelog
 ###Version 0.1.1525
 *Updated: 6/20/2015*
 
+* Added joystick support (complete)
 * GLFW window support (partial)
 * GLFW keyboard support (partial)
 

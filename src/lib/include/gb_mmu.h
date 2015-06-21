@@ -32,6 +32,8 @@ namespace GB_NS {
 			
 				static void _delete(void);
 
+				gb_joy_ptr _joystick(void);
+
 				static _gb_mmu *acquire(void);
 				
 				static std::string buffer_as_string(
@@ -101,6 +103,8 @@ namespace GB_NS {
 			
 				static _gb_mmu *m_inst;
 			
+				gb_joy_ptr m_joy;
+
 			private:
 			
 				gb_buf_t m_buf;

@@ -27,7 +27,8 @@ namespace GB_NS {
 		gb_mmu_ptr gb_mmu::m_inst = NULL;
 		
 		_gb_mmu::_gb_mmu(void) :
-			m_init(false)
+			m_init(false),
+			m_joy(gb_joy::acquire())
 		{
 			std::atexit(gb_mmu::_delete);
 		}
@@ -48,6 +49,12 @@ namespace GB_NS {
 				delete gb_mmu::m_inst;
 				gb_mmu::m_inst = NULL;
 			}
+		}
+
+		gb_joy_ptr 
+		_gb_mmu::_joystick(void)
+		{
+			return m_joy;
 		}
 
 		gb_mmu_ptr 
@@ -286,7 +293,25 @@ namespace GB_NS {
 				THROW_GB_MMU_EXCEPTION(GB_MMU_EXCEPTION_UNINITIALIZED);
 			}
 			
-			m_buf.at(addr) = val;
+			switch(addr) {
+				case GB_REG_P1:
+
+					switch(val) {
+						case GB_KEY_COLUMN_ACT:
+							m_buf.at(addr) = m_joy->read_action();
+							break;
+						case GB_KEY_COLUMN_DIR:
+							m_buf.at(addr) = m_joy->read_direction();
+							break;
+						default:
+							m_buf.at(addr) = val;
+							break;
+					}
+					break;
+				default:
+					m_buf.at(addr) = val;
+					break;
+			}
 		}
 		
 		void 
