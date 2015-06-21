@@ -298,10 +298,10 @@ namespace GB_NS {
 
 					switch(val) {
 						case GB_KEY_COLUMN_ACT:
-							m_buf.at(addr) = m_joy->read_action();
+							m_buf.at(addr) = (val | m_joy->read_action());
 							break;
 						case GB_KEY_COLUMN_DIR:
-							m_buf.at(addr) = m_joy->read_direction();
+							m_buf.at(addr) = (val | m_joy->read_direction());
 							break;
 						default:
 							m_buf.at(addr) = val;

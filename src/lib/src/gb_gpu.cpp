@@ -400,7 +400,7 @@ namespace GB_NS {
 					if(m_tot >= GB_GPU_HBLNK_CLK) {
 						m_tot = 0;
 
-						if(++m_line == GB_GPU_HLINE_MAX) {
+						if(++m_line >= GB_GPU_HLINE_MAX) {
 							m_state = GB_GPU_STATE_VBLNK;
 
 							if(m_active) {
@@ -416,7 +416,7 @@ namespace GB_NS {
 					if(m_tot >= GB_GPU_VBLNK_CLK) {
 						m_tot = 0;
 
-						if(++m_line == GB_GPU_VLINE_MAX) {
+						if(++m_line >= GB_GPU_VLINE_MAX) {
 							m_state = GB_GPU_STATE_OAM;
 							m_line = 0;
 						}
