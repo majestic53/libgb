@@ -52,10 +52,7 @@ namespace GB_NS {
 
 				void resume(void);
 
-				void start(
-					__in_opt const std::string &title = std::string(),
-					__in_opt bool detach = true
-					);
+				void start(void);
 
 				gbb_t step(void);
 
@@ -265,6 +262,10 @@ namespace GB_NS {
 					__in gbb_t code
 					);
 
+				void execute_interrupt(
+					__in gb_int_t type
+					);
+
 				gbw_t hl(void);
 
 				void set_af(
@@ -302,7 +303,7 @@ namespace GB_NS {
 
 				uint32_t m_tot;
 
-				bool m_halt, m_ime, m_stop;
+				bool m_halt, m_stop;
 
 		} gb_cpu, *gb_cpu_ptr;
 	}

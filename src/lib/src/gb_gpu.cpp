@@ -121,7 +121,6 @@ namespace GB_NS {
 			mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 			glfwSetWindowPos(win, (mode->width - GB_GPU_VLINE_LEN) / 2,
 				(mode->height - GB_GPU_HLINE_LEN) / 2);
-
 			glfwMakeContextCurrent(win);
 			glfwSwapInterval(GB_SWAP_INTERVAL);
 			glfwSetWindowCloseCallback(win, graphics_close);
@@ -144,6 +143,7 @@ namespace GB_NS {
 
 			glfwDestroyWindow(win);
 			glfwTerminate();
+			gb::stop();
 		}
 
 		void 
@@ -151,7 +151,7 @@ namespace GB_NS {
 			__in GLFWwindow *win
 			)
 		{
-			gb::acquire()->acquire_cpu()->stop();
+			gb::stop();
 		}
 
 		void 
@@ -207,6 +207,8 @@ namespace GB_NS {
 			__in int mods
 			)
 		{
+			gbb_t off;
+			bool pressed = false;
 
 			switch(key) {
 
@@ -215,6 +217,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_action_a();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_action_a();
@@ -226,6 +229,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_action_b();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_action_b();
@@ -237,6 +241,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_direction_down();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_direction_down();
@@ -254,6 +259,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_direction_left();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_direction_left();
@@ -265,6 +271,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_direction_right();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_direction_right();
@@ -276,6 +283,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_action_select();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_action_select();
@@ -287,6 +295,7 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_action_start();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_action_start();
@@ -298,12 +307,21 @@ namespace GB_NS {
 					switch(action) {
 						case GLFW_PRESS:
 							m_mmu->_joystick()->set_direction_up();
+							pressed = true;
 							break;
 						case GLFW_RELEASE:
 							m_mmu->_joystick()->clear_direction_up();
 							break;
 					}
 					break;
+			}
+
+			if(pressed && gb::interrupt_master_enable()) {
+
+				off = (1 << GB_INTERRUPT_JOY_PRESS);
+				if(m_mmu->read_byte(GB_REG_IE) & off) {
+					m_mmu->write_byte(GB_REG_IF, m_mmu->read_byte(GB_REG_IF) | off);
+				}
 			}
 		}
 
@@ -387,6 +405,7 @@ namespace GB_NS {
 			__in gbb_t last
 			)
 		{
+			gbb_t off;
 
 			if(!m_init) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_UNINITIALIZED);
@@ -412,6 +431,14 @@ namespace GB_NS {
 					}
 					break;
 				case GB_GPU_STATE_VBLNK:
+
+					if(gb::interrupt_master_enable()) {
+
+						off = (1 << GB_INTERRUPT_VBLNK);
+						if(m_mmu->read_byte(GB_REG_IE) & off) {
+							m_mmu->write_byte(GB_REG_IF, m_mmu->read_byte(GB_REG_IF) | off);
+						}
+					}
 
 					if(m_tot >= GB_GPU_VBLNK_CLK) {
 						m_tot = 0;

@@ -69,14 +69,18 @@ namespace GB_NS {
 
 			void initialize(void);
 
+			static bool &interrupt_master_enable(void);
+
 			static bool is_allocated(void);
 
 			bool is_initialized(void);
 
-			void run(
+			void start(
 				__in const std::string &in,
 				__in_opt bool path = false
 				);
+
+			static void stop(void);
 
 			std::string to_string(
 				__in_opt bool verb = false,
@@ -111,6 +115,8 @@ namespace GB_NS {
 			void release_mmu(void);
 
 			bool m_init;
+
+			static bool m_active, m_ime;
 
 			static _gb *m_inst;
 

@@ -24,6 +24,14 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
+		static const gb_addr_t GB_INTERRUPT_ADDR[] = {
+			0x40, 0x48, 0x50, 0x58, 0x60,
+			};
+
+		#define GB_INTERRUPT_ADDRESS(_TYPE_) \
+			((_TYPE_) > GB_INTERRUPT_MAX ? GB_REG_RST_VEC_0 : \
+			GB_INTERRUPT_ADDR[_TYPE_])
+
 		#define DETERMINE_HALF_CARRY(_A_, _B_) \
 			(((_A_) ^ (_B_)) & (UINT4_MAX + 1))
 		#define _DETERMINE_HALF_CARRY(_RES_, _A_, _B_, _LEN_) \
@@ -60,9 +68,9 @@ namespace GB_NS {
 			m_sp(GB_REG_SP_INIT),
 			m_tot(0),
 			m_halt(GB_INT_HALT_INIT),
-			m_ime(GB_INT_IME_INIT),
 			m_stop(GB_INT_STOP_INIT)
 		{
+			gb::interrupt_master_enable() = GB_INT_IME_INIT;
 			std::atexit(gb_cpu::_delete);
 		}
 
@@ -1756,7 +1764,7 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			m_ime = false;
+			gb::interrupt_master_enable() = false;
 			m_last = 1;
 		}
 
@@ -1765,7 +1773,7 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
-			m_ime = true;
+			gb::interrupt_master_enable() = true;
 			m_last = 1;
 		}
 
@@ -2964,7 +2972,7 @@ namespace GB_NS {
 		{
 			m_pc = m_mmu->read_word(m_sp);
 			m_sp += sizeof(gbw_t);
-			m_ime = true;
+			gb::interrupt_master_enable() = true;
 			m_last = 2;
 		}
 
@@ -4781,6 +4789,27 @@ namespace GB_NS {
 		}
 
 		void 
+		_gb_cpu::execute_interrupt(
+			__in gb_int_t type
+			)
+		{
+
+			if(m_halt) {
+				resume();
+			} 
+
+			if(m_stop && (type == GB_INTERRUPT_JOY_PRESS)) {
+				start();
+			}
+
+			gb::interrupt_master_enable() = false;
+			m_mmu->write_word(m_sp, m_pc);
+			m_sp -= sizeof(gbw_t);
+			m_pc = GB_INTERRUPT_ADDRESS(type);
+			m_last += 3;
+		}
+
+		void 
 		_gb_cpu::halt(void)
 		{
 
@@ -4868,7 +4897,7 @@ namespace GB_NS {
 			m_sp = GB_REG_SP_INIT;
 			m_tot = 0;
 			m_halt = GB_INT_HALT_INIT;
-			m_ime = GB_INT_IME_INIT;
+			gb::interrupt_master_enable() = GB_INT_IME_INIT;
 			m_stop = GB_INT_STOP_INIT;
 		}
 
@@ -4920,24 +4949,20 @@ namespace GB_NS {
 		}
 
 		void 
-		_gb_cpu::start(
-			__in_opt const std::string &title,
-			__in_opt bool detach
-			)
+		_gb_cpu::start(void)
 		{
 
 			if(!m_stop) {
 				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_INVALID_STATE);
 			}
 
-			m_gpu->start(title, detach);
 			m_stop = false;
 		}
 
 		gbb_t 
 		_gb_cpu::step(void)
 		{
-			gbb_t code;
+			gbb_t code, ire, irf, iter = 0, off;
 
 			if(!m_init) {
 				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_UNINITIALIZED);
@@ -4949,6 +4974,23 @@ namespace GB_NS {
 				execute_extended(code);
 			} else {
 				execute(code);
+			}
+
+			if(gb::interrupt_master_enable()) {
+
+				ire = m_mmu->read_byte(GB_REG_IE);
+				irf = m_mmu->read_byte(GB_REG_IF);
+				if(ire && irf) {
+
+					for(; iter <= GB_INTERRUPT_MAX; ++iter) {
+						off = (1 << iter);				
+
+						if((ire & off) && (irf & off)) {
+							m_mmu->write_byte(GB_REG_IF, irf & ~off);
+							execute_interrupt((gb_int_t) iter);
+						}	
+					}
+				}
 			}
 
 			m_gpu->step(m_last);
@@ -4965,7 +5007,6 @@ namespace GB_NS {
 				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_INVALID_STATE);
 			}
 
-			m_gpu->stop();
 			m_stop = true;
 		}
 
@@ -5073,7 +5114,8 @@ namespace GB_NS {
 				res << ")" << std::endl << "PC=0x" << VAL_AS_HEX(gbw_t, m_pc) << std::endl 
 					<< "SP=0x" << VAL_AS_HEX(gbw_t, m_sp) << std::endl << "LAST=" 
 					<< (uint16_t) m_last << ", TOTAL=" << m_tot << std::endl << "HALT=" 
-					<< m_halt << ", IME=" << m_ime << ", STOP=" << m_stop;
+					<< m_halt << ", IME=" << gb::interrupt_master_enable() << ", STOP=" 
+					<< m_stop;
 			}
 
 			return res.str();

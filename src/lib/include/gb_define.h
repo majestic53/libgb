@@ -49,7 +49,7 @@ namespace GB_NS {
 	#define BLD_VER_WEEK 1525
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8
-	#define BITS_PER_NIBBLE 4
+	#define BITS_PER_NIBBLE 5
 	#define BYTES_PER_KBYTE (1024.0)
 	#define GCD_MAX 9
 	#define EMPTY "EMPTY"

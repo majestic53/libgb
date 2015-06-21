@@ -15,6 +15,11 @@ Changelog
 =========
 
 ###Version 0.1.1525
+*Updated: 6/21/2015*
+
+* Added support for vertical blank and joystick press interrupts
+* Fixed HALT/STOP issues
+
 *Updated: 6/20/2015*
 
 * Added joystick support (complete)

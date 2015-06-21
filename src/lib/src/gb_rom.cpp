@@ -579,18 +579,18 @@ namespace GB_NS {
 			<< "KB (" << m_buf.size() << " bytes)";
 
 		if(verb) {
-			res << std::endl << "--- TITLE=\'" << CHK_STR(title()) << "\'" << std::endl
-			<< "--- SYSTEM=" << system_type_as_string(system()) << std::endl
-			<< "--- LICENSE=0x" << VAL_AS_HEX(gbb_t, license()) << " (OLD=0x" 
+			res << std::endl << "TITLE=\'" << CHK_STR(title()) << "\'" << std::endl
+			<< "SYSTEM=" << system_type_as_string(system()) << std::endl
+			<< "LICENSE=0x" << VAL_AS_HEX(gbb_t, license()) << " (OLD=0x" 
 			<< VAL_AS_HEX(gbb_t, license_old()) << ")" << std::endl
-			<< "--- INDICATOR=" << indicator_type_as_string(indicator()) << std::endl
-			<< "--- CARTRIDGE=" << cartridge_type_as_string(cartridge()) << std::endl
-			<< "--- ROM=" << rom_type_as_string(rom()) << std::endl
-			<< "--- RAM=" << ram_type_as_string(ram()) << std::endl
-			<< "--- DESTINATION=" << destination_type_as_string(destination()) << std::endl
-			<< "--- MASK_ROM_VER=0x" << VAL_AS_HEX(gbb_t, mask_rom()) << std::endl
-			<< "--- COMPLEMENT=0x" << VAL_AS_HEX(gbb_t, complement()) << std::endl
-			<< "--- CHECKSUM=0x" << VAL_AS_HEX(gbw_t, checksum());
+			<< "INDICATOR=" << indicator_type_as_string(indicator()) << std::endl
+			<< "CARTRIDGE=" << cartridge_type_as_string(cartridge()) << std::endl
+			<< "ROM=" << rom_type_as_string(rom()) << std::endl
+			<< "RAM=" << ram_type_as_string(ram()) << std::endl
+			<< "DESTINATION=" << destination_type_as_string(destination()) << std::endl
+			<< "MASK_ROM_VER=0x" << VAL_AS_HEX(gbb_t, mask_rom()) << std::endl
+			<< "COMPLEMENT=0x" << VAL_AS_HEX(gbb_t, complement()) << std::endl
+			<< "CHECKSUM=0x" << VAL_AS_HEX(gbw_t, checksum());
 		}
 
 		return res.str();

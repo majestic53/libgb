@@ -22,6 +22,8 @@
 
 namespace GB_NS {
 
+	bool gb::m_active = false;
+	bool gb::m_ime = GB_INT_IME_INIT;
 	gb_ptr gb::m_inst = NULL;
 
 	_gb::_gb(void) :
@@ -130,6 +132,12 @@ namespace GB_NS {
 		m_init = true;
 	}
 
+	bool &
+	_gb::interrupt_master_enable(void)
+	{
+		return m_ime;
+	}
+
 	bool 
 	_gb::is_allocated(void)
 	{
@@ -183,7 +191,7 @@ namespace GB_NS {
 	}
 
 	void 
-	_gb::run(
+	_gb::start(
 		__in const std::string &in,
 		__in_opt bool path
 		)
@@ -195,28 +203,41 @@ namespace GB_NS {
 			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_UNINITIALIZED);
 		}
 
-		m_inst_cpu->start(rom.title());
+		m_active = true;
+		m_inst_gpu->start(rom.title(), true);
 
 		// TODO: startup; load bios
 
-		while(!m_inst_cpu->is_stopped()) {
+		m_inst_cpu->start();
 
-			if(bios && !m_inst_cpu->is_zero_page()) {
-				bios = false;
+		while(m_active) {
 
-				// TODO: remove BIOS from zero page and replace with rom contents
+			if(!m_inst_cpu->is_halted() && !m_inst_cpu->is_stopped()) {
 
-			} else if(m_inst_cpu->is_halted()) {
+				if(bios && !m_inst_cpu->is_zero_page()) {
+					bios = false;
 
-				// TODO: check mmu interrupt register and then call resume
+					// TODO: remove BIOS from zero page and replace with rom contents
 
+				} else {
+
+					// TODO: step CPU here
+					usleep(1000);
+					// ---
+				}
 			} else {
 
-				// TODO: step CPU here
-				usleep(1000);
-				// ---
+				// TODO: busy wait, fix this!
 			}
 		}
+
+		m_inst_gpu->stop();
+	}
+
+	void 
+	_gb::stop(void)
+	{
+		m_active = false;
 	}
 
 	std::string 
