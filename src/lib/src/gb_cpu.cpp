@@ -243,7 +243,7 @@ namespace GB_NS {
 					break;
 				default:
 					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CMD,
-						"0x%x", cmd);
+						"0x%x:0x%x", cmd, code);
 			}
 		}
 
@@ -1300,17 +1300,17 @@ namespace GB_NS {
 			switch(code) {
 				case GB_CODE_CALL_NN:
 					addr = m_mmu->read_word(m_pc);
+					m_sp -= sizeof(gbw_t);
 					m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
 					m_pc = addr;
-					m_sp -= sizeof(gbw_t);
 					break;
 				case GB_CODE_CALL_NZ_NN:
 
 					if(!(m_rf & GB_FLAG_Z)) {
 						addr = m_mmu->read_word(m_pc);
+						m_sp -= sizeof(gbw_t);
 						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
 						m_pc = addr;
-						m_sp -= sizeof(gbw_t);
 					} else {
 						m_pc += sizeof(gbw_t);
 					}
@@ -1319,9 +1319,9 @@ namespace GB_NS {
 
 					if(m_rf & GB_FLAG_Z) {
 						addr = m_mmu->read_word(m_pc);
+						m_sp -= sizeof(gbw_t);
 						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
 						m_pc = addr;
-						m_sp -= sizeof(gbw_t);
 					} else {
 						m_pc += sizeof(gbw_t);
 					}
@@ -1330,9 +1330,9 @@ namespace GB_NS {
 
 					if(!(m_rf & GB_FLAG_C)) {
 						addr = m_mmu->read_word(m_pc);
+						m_sp -= sizeof(gbw_t);
 						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
 						m_pc = addr;
-						m_sp -= sizeof(gbw_t);
 					} else {
 						m_pc += sizeof(gbw_t);
 					}
@@ -1341,9 +1341,9 @@ namespace GB_NS {
 
 					if(m_rf & GB_FLAG_C) {
 						addr = m_mmu->read_word(m_pc);
+						m_sp -= sizeof(gbw_t);
 						m_mmu->write_word(m_sp, m_pc + sizeof(gbw_t));
 						m_pc = addr;
-						m_sp -= sizeof(gbw_t);
 					} else {
 						m_pc += sizeof(gbw_t);
 					}
@@ -2622,6 +2622,7 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
+			m_sp -= sizeof(gbw_t);
 
 			switch(code) {
 				case GB_CODE_PUSH_AF:
@@ -2641,7 +2642,6 @@ namespace GB_NS {
 						"%s:0x%x", GB_CMD_STRING(GB_CMD_PUSH), code);
 			}
 
-			m_sp -= sizeof(gbw_t);
 			m_last = 4;
 		}
 
@@ -3549,9 +3549,9 @@ namespace GB_NS {
 			__in gbb_t code
 			)
 		{
+			m_sp -= sizeof(gbw_t);
 			m_mmu->write_word(m_sp, m_pc);
 			m_pc += sizeof(gbw_t);
-			m_sp -= sizeof(gbw_t);
 
 			switch(code) {
 				case GB_CODE_RST_0:
@@ -4784,7 +4784,7 @@ namespace GB_NS {
 					break;
 				default:
 					THROW_GB_CPU_EXCEPTION_MESSAGE(GB_CPU_EXCEPTION_INVALID_CMD,
-						"0x%x", cmd);
+						"0x%x:0x%x", cmd, code);
 			}
 		}
 
@@ -4803,8 +4803,8 @@ namespace GB_NS {
 			}
 
 			gb::interrupt_master_enable() = false;
-			m_mmu->write_word(m_sp, m_pc);
 			m_sp -= sizeof(gbw_t);
+			m_mmu->write_word(m_sp, m_pc);			
 			m_pc = GB_INTERRUPT_ADDRESS(type);
 			m_last += 3;
 		}

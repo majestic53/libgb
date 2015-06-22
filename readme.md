@@ -17,7 +17,10 @@ Changelog
 ###Version 0.1.1525
 *Updated: 6/21/2015*
 
+* Bootup successful!
+	* Emulator is able to boot and transition to ROM
 * Added support for vertical blank and joystick press interrupts
+* Fixed various minor CPU issues
 * Fixed HALT/STOP issues
 
 *Updated: 6/20/2015*

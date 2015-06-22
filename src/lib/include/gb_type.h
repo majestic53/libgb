@@ -34,14 +34,16 @@ namespace GB_NS {
 		GB_GB_EXCEPTION_ALLOC_FAILED = 0,
 		GB_GB_EXCEPTION_INITIALIZED,
 		GB_GB_EXCEPTION_UNINITIALIZED,
+		GB_GB_EXCEPTION_UNSUPPORTED,
 	};
 	
-	#define GB_GB_EXCEPTION_MAX GB_GB_EXCEPTION_UNINITIALIZED
+	#define GB_GB_EXCEPTION_MAX GB_GB_EXCEPTION_UNSUPPORTED
 	
 	static const std::string GB_GB_EXCEPTION_STR[] = {
 		GB_GB_EXCEPTION_HEADER " Failed to allocate library",
 		GB_GB_EXCEPTION_HEADER " Library is already initialized",
 		GB_GB_EXCEPTION_HEADER " Library is uninitialized",
+		GB_GB_EXCEPTION_HEADER " Unsupported cartridge type",
 		};
 		
 	#define GB_GB_EXCEPTION_STRING(_TYPE_) \

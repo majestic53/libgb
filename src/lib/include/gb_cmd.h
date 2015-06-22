@@ -727,13 +727,13 @@ namespace GB_NS {
 			GB_CMD_CALL, INVALID(gb_cmd_t), GB_CMD_SBC, GB_CMD_RST, 
 
 			// 0xe0
-			GB_CMD_LDH, GB_CMD_POP, GB_CMD_LDH, INVALID(gb_cmd_t), 
+			GB_CMD_LDH, GB_CMD_POP, GB_CMD_LD, INVALID(gb_cmd_t), 
 			INVALID(gb_cmd_t), GB_CMD_PUSH, GB_CMD_AND, GB_CMD_RST, 
 			GB_CMD_ADD, GB_CMD_JP, GB_CMD_LD, INVALID(gb_cmd_t), 
 			INVALID(gb_cmd_t), INVALID(gb_cmd_t), GB_CMD_XOR, GB_CMD_RST, 
 
 			// 0xf0
-			GB_CMD_LDH, GB_CMD_POP, INVALID(gb_cmd_t), GB_CMD_DI, 
+			GB_CMD_LDH, GB_CMD_POP, GB_CMD_LD, GB_CMD_DI, 
 			INVALID(gb_cmd_t), GB_CMD_PUSH, GB_CMD_OR, GB_CMD_RST, 
 			GB_CMD_LDHL, GB_CMD_LD, GB_CMD_LD, GB_CMD_EI, 
 			INVALID(gb_cmd_t), INVALID(gb_cmd_t), GB_CMD_CP, GB_CMD_RST,
@@ -842,8 +842,8 @@ namespace GB_NS {
 
 	#define GB_CMD_TYPE(_TYPE_, _CODE_) \
 		((_TYPE_) > GB_CMD_TYPE_EXT ? INVALID(gb_cmd_t) : \
-		(_CODE_) > GBB_MAX_LEN ? INVALID(gb_cmd_t) : \
-		GB_CMD_TY[_TYPE_][_CODE_])
+		((_CODE_) > GBB_MAX_LEN ? INVALID(gb_cmd_t) : \
+		GB_CMD_TY[_TYPE_][_CODE_]))
 }
 
 #endif // GB_CMD_H_

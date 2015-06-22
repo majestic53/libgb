@@ -203,11 +203,16 @@ namespace GB_NS {
 			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_UNINITIALIZED);
 		}
 
+		if(rom.cartridge() != GB_CART_ROM_ONLY) {
+			THROW_GB_GB_EXCEPTION_MESSAGE(GB_GB_EXCEPTION_UNSUPPORTED,
+				"%s (0x%x)", CHK_STR(gb_rom::cartridge_as_string(rom.cartridge())), 
+				rom.cartridge());
+		}
+
 		m_active = true;
 		m_inst_gpu->start(rom.title(), true);
-
-		// TODO: startup; load bios
-
+		m_inst_mmu->insert(0, rom.buffer());
+		m_inst_mmu->insert(0, GB_BIOS_RAW);
 		m_inst_cpu->start();
 
 		while(m_active) {
@@ -216,13 +221,20 @@ namespace GB_NS {
 
 				if(bios && !m_inst_cpu->is_zero_page()) {
 					bios = false;
+					m_inst_mmu->insert(0, gb_buf_t(rom.buffer().begin(), 
+						rom.buffer().begin() + (GB_BIOS_ADDR_STOP + 1)));
 
-					// TODO: remove BIOS from zero page and replace with rom contents
+					std::cout << m_inst_mmu->to_string(true, 0, 0x8000) << std::endl;
+
+					// TODO: set all registers to post-bios defaults
+					std::cin.get();
+					//
 
 				} else {
 
 					// TODO: step CPU here
-					usleep(1000);
+					m_inst_cpu->step();
+					//sleep(1);
 					// ---
 				}
 			} else {

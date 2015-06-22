@@ -76,7 +76,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::cartridge_type_as_string(
+	_gb_rom::cartridge_as_string(
 		__in gb_cart_t type
 		)
 	{
@@ -198,7 +198,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::destination_type_as_string(
+	_gb_rom::destination_as_string(
 		__in gb_dest_t type
 		)
 	{
@@ -232,7 +232,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::indicator_type_as_string(
+	_gb_rom::indicator_as_string(
 		__in gb_ind_t type
 		)
 	{
@@ -356,7 +356,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::ram_type_as_string(
+	_gb_rom::ram_as_string(
 		__in gb_ram_t type
 		)
 	{
@@ -443,7 +443,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::rom_type_as_string(
+	_gb_rom::rom_as_string(
 		__in gb_rom_t type
 		)
 	{
@@ -528,7 +528,7 @@ namespace GB_NS {
 	}
 
 	std::string 
-	_gb_rom::system_type_as_string(
+	_gb_rom::system_as_string(
 		__in gb_sys_t type
 		)
 	{
@@ -580,14 +580,14 @@ namespace GB_NS {
 
 		if(verb) {
 			res << std::endl << "TITLE=\'" << CHK_STR(title()) << "\'" << std::endl
-			<< "SYSTEM=" << system_type_as_string(system()) << std::endl
+			<< "SYSTEM=" << system_as_string(system()) << std::endl
 			<< "LICENSE=0x" << VAL_AS_HEX(gbb_t, license()) << " (OLD=0x" 
 			<< VAL_AS_HEX(gbb_t, license_old()) << ")" << std::endl
-			<< "INDICATOR=" << indicator_type_as_string(indicator()) << std::endl
-			<< "CARTRIDGE=" << cartridge_type_as_string(cartridge()) << std::endl
-			<< "ROM=" << rom_type_as_string(rom()) << std::endl
-			<< "RAM=" << ram_type_as_string(ram()) << std::endl
-			<< "DESTINATION=" << destination_type_as_string(destination()) << std::endl
+			<< "INDICATOR=" << indicator_as_string(indicator()) << std::endl
+			<< "CARTRIDGE=" << cartridge_as_string(cartridge()) << std::endl
+			<< "ROM=" << rom_as_string(rom()) << std::endl
+			<< "RAM=" << ram_as_string(ram()) << std::endl
+			<< "DESTINATION=" << destination_as_string(destination()) << std::endl
 			<< "MASK_ROM_VER=0x" << VAL_AS_HEX(gbb_t, mask_rom()) << std::endl
 			<< "COMPLEMENT=0x" << VAL_AS_HEX(gbb_t, complement()) << std::endl
 			<< "CHECKSUM=0x" << VAL_AS_HEX(gbw_t, checksum());

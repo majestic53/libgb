@@ -26,11 +26,11 @@ namespace GB_NS {
 
 		#define GB_GPU_HBLNK_CLK 204
 		#define GB_GPU_HLINE_LEN 144
-		#define GB_GPU_HLINE_MAX (GB_GPU_HLINE_LEN - 1)
+		#define GB_GPU_HLINE_MAX 143
 		#define GB_GPU_OAM_CLK 80
 		#define GB_GPU_VBLNK_CLK 456
 		#define GB_GPU_VLINE_LEN 160
-		#define GB_GPU_VLINE_MAX (GB_GPU_VLINE_LEN - 1)
+		#define GB_GPU_VLINE_MAX 153
 		#define GB_GPU_VRAM_CLK 172
 		#define GB_SWAP_INTERVAL 1
 
@@ -172,8 +172,8 @@ namespace GB_NS {
 			float ratio;
 			int height, width;
 
-			//if(gb_gpu::m_update) {
-			//	gb_gpu::m_update = false;
+			if(gb_gpu::m_update) {
+				gb_gpu::m_update = false;
 
 				// TODO: draw m_buf to win
 				glfwGetFramebufferSize(win, &width, &height);
@@ -195,7 +195,7 @@ namespace GB_NS {
 				glVertex3f(0.f, 0.6f, 0.f);
 				glEnd();
 				// ---
-			//}
+			}
 		}
 
 		void 
@@ -425,6 +425,7 @@ namespace GB_NS {
 							if(m_active) {
 								m_update = true;
 							}
+
 						} else {
 							m_state = GB_GPU_STATE_OAM;
 						}
@@ -443,10 +444,12 @@ namespace GB_NS {
 					if(m_tot >= GB_GPU_VBLNK_CLK) {
 						m_tot = 0;
 
-						if(++m_line >= GB_GPU_VLINE_MAX) {
+						if(++m_line > GB_GPU_VLINE_MAX) {
 							m_state = GB_GPU_STATE_OAM;
 							m_line = 0;
 						}
+
+						m_mmu->write_byte(GB_REG_LY, m_line);
 					}
 					break;
 				case GB_GPU_STATE_OAM:

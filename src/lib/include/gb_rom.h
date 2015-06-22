@@ -106,13 +106,25 @@ namespace GB_NS {
 
 			gb_cart_t cartridge(void);
 
+			static std::string cartridge_as_string(
+				__in gb_cart_t type
+				);
+
 			gbw_t checksum(void);
 
 			gbb_t complement(void);
 
 			gb_dest_t destination(void);
 
+			static std::string destination_as_string(
+				__in gb_dest_t type
+				);
+
 			gb_ind_t indicator(void);
+
+			static std::string indicator_as_string(
+				__in gb_ind_t type
+				);
 
 			gbb_t license(void);
 
@@ -122,9 +134,17 @@ namespace GB_NS {
 
 			gb_ram_t ram(void);
 
+			static std::string ram_as_string(
+				__in gb_ram_t type
+				);
+
 			gbb_t ram_banks(void);
 
 			gb_rom_t rom(void);
+
+			static std::string rom_as_string(
+				__in gb_rom_t type
+				);
 
 			gbb_t rom_banks(void);
 
@@ -135,6 +155,10 @@ namespace GB_NS {
 
 			gb_sys_t system(void);
 
+			static std::string system_as_string(
+				__in gb_sys_t type
+				);
+
 			std::string title(void);
 
 			virtual std::string to_string(
@@ -142,30 +166,6 @@ namespace GB_NS {
 				);
 
 		protected:
-
-			static std::string cartridge_type_as_string(
-				__in gb_cart_t type
-				);
-
-			static std::string destination_type_as_string(
-				__in gb_dest_t type
-				);
-
-			static std::string indicator_type_as_string(
-				__in gb_ind_t type
-				);
-
-			static std::string ram_type_as_string(
-				__in gb_ram_t type
-				);
-
-			static std::string rom_type_as_string(
-				__in gb_rom_t type
-				);
-
-			static std::string system_type_as_string(
-				__in gb_sys_t type
-				);
 
 			gb_buf_t m_buf;
 
