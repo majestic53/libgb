@@ -21,7 +21,7 @@ Changelog
 	* Emulator is able to boot and transition to ROM
 * Added support for vertical blank and joystick press interrupts
 * Fixed various minor CPU issues
-* Fixed HALT/STOP issues
+	* Fixed HALT/STOP issues
 
 *Updated: 6/20/2015*
 
