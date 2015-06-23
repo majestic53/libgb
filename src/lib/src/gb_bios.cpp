@@ -19,6 +19,7 @@
 
 #include <fstream>
 #include "../include/gb.h"
+#include "../include/gb_type.h"
 
 namespace GB_NS {
 
@@ -27,11 +28,13 @@ namespace GB_NS {
 		__in const std::string &path
 		)
 	{
-
 		std::ofstream file(CHK_STR(path), std::ios::out | std::ios::binary);
+
 		if(file) {
-			file.write((const char *) &GB_BIOS_RAW[0], GB_BIOS_RAW.size());
-			file.close();
+			THROW_GB_GB_EXCEPTION(GB_GB_EXCEPTION_BIOS_EXPORT_FAILED);
 		}
+
+		file.write((const char *) &GB_BIOS_RAW[0], GB_BIOS_RAW.size());
+		file.close();
 	}
 }

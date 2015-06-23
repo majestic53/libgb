@@ -575,7 +575,8 @@ namespace GB_NS {
 	{
 		std::stringstream res;
 
-		res << GB_ROM_HEADER << " " << std::setprecision(3) << (float) (m_buf.size() / BYTES_PER_KBYTE) 
+		res << GB_ROM_HEADER << " " << std::setprecision(3) 
+			<< (float) (m_buf.size() / BYTES_PER_KBYTE) 
 			<< "KB (" << m_buf.size() << " bytes)";
 
 		if(verb) {

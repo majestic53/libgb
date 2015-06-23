@@ -93,10 +93,8 @@ namespace GB_NS {
 					if(verb && !sect.empty()) {
 						res << "\t";
 					
-						for(sect_iter = sect.begin(); 
-								sect_iter != sect.end();
+						for(sect_iter = sect.begin(); sect_iter != sect.end(); 
 								++sect_iter) {
-								
 							res << (std::isprint((char) *sect_iter) ? 
 								(char) *sect_iter : '.');
 						}
@@ -127,10 +125,8 @@ namespace GB_NS {
 
 				res << "\t";
 
-				for(sect_iter = sect.begin(); 
-						sect_iter != sect.end();
+				for(sect_iter = sect.begin(); sect_iter != sect.end(); 
 						++sect_iter) {
-						
 					res << (std::isprint((char) *sect_iter) ? 
 						(char) *sect_iter : '.');
 				}
@@ -213,6 +209,47 @@ namespace GB_NS {
 			return m_init;
 		}
 		
+		void 
+		_gb_mmu::operational(void) 
+		{
+
+			if(!m_init) {
+				THROW_GB_MMU_EXCEPTION(GB_MMU_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_buf[GB_REG_BGP] = GB_REG_BGP_OPER;
+			m_buf[GB_REG_IE] = GB_REG_IE_OPER;
+			m_buf[GB_REG_LCDC] = GB_REG_LCDC_OPER;
+			m_buf[GB_REG_LYC] = GB_REG_LYC_OPER;
+			m_buf[GB_REG_OBP0] = GB_REG_OBP0_OPER;
+			m_buf[GB_REG_OBP1] = GB_REG_OBP1_OPER;
+			m_buf[GB_REG_SCX] = GB_REG_SCX_OPER;
+			m_buf[GB_REG_SCY] = GB_REG_SCY_OPER;
+			m_buf[GB_REG_NR_10] = GB_REG_NR_10_OPER;
+			m_buf[GB_REG_NR_11] = GB_REG_NR_11_OPER;
+			m_buf[GB_REG_NR_12] = GB_REG_NR_12_OPER;
+			m_buf[GB_REG_NR_14] = GB_REG_NR_14_OPER;
+			m_buf[GB_REG_NR_21] = GB_REG_NR_21_OPER;
+			m_buf[GB_REG_NR_22] = GB_REG_NR_22_OPER;
+			m_buf[GB_REG_NR_24] = GB_REG_NR_24_OPER;
+			m_buf[GB_REG_NR_30] = GB_REG_NR_30_OPER;
+			m_buf[GB_REG_NR_31] = GB_REG_NR_31_OPER;
+			m_buf[GB_REG_NR_32] = GB_REG_NR_32_OPER;
+			m_buf[GB_REG_NR_33] = GB_REG_NR_33_OPER;
+			m_buf[GB_REG_NR_41] = GB_REG_NR_41_OPER;
+			m_buf[GB_REG_NR_42] = GB_REG_NR_42_OPER;
+			m_buf[GB_REG_NR_43] = GB_REG_NR_43_OPER;
+			m_buf[GB_REG_NR_44] = GB_REG_NR_44_OPER;
+			m_buf[GB_REG_NR_50] = GB_REG_NR_50_OPER;
+			m_buf[GB_REG_NR_51] = GB_REG_NR_51_OPER;
+			m_buf[GB_REG_NR_52] = GB_REG_NR_52_OPER;
+			m_buf[GB_REG_TAC] = GB_REG_TAC_OPER;
+			m_buf[GB_REG_TIMA] = GB_REG_TIMA_OPER;
+			m_buf[GB_REG_TMA] = GB_REG_TMA_OPER;
+			m_buf[GB_REG_WX] = GB_REG_WX_OPER;
+			m_buf[GB_REG_WY] = GB_REG_WY_OPER;
+		}
+
 		gbb_t 
 		_gb_mmu::read_byte(
 			__in gb_addr_t addr

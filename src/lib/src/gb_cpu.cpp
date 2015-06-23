@@ -119,6 +119,12 @@ namespace GB_NS {
 			return ((m_rb << BITS_PER_BYTE) | m_rc);
 		}
 
+		gb_addr_t 
+		_gb_cpu::count(void)
+		{
+			return m_pc;
+		}
+
 		gbw_t 
 		_gb_cpu::de(void)
 		{
@@ -689,8 +695,8 @@ namespace GB_NS {
 				case GB_CODE_ADD_SP_N:
 					m_rf = 0;
 					tmp0 = m_sp;
-					off = m_mmu->read_byte(m_pc++);
 
+					off = m_mmu->read_byte(m_pc++);
 					if((m_sp + off) > GBW_MAX_LEN) {
 						m_rf |= GB_FLAG_C;
 					}
@@ -1556,7 +1562,6 @@ namespace GB_NS {
 			}
 
 			m_rf &= ~(GB_FLAG_H | GB_FLAG_Z);
-
 			if((m_rf & GB_FLAG_C) 
 					|| (((old >> BITS_PER_NIBBLE) & UINT4_MAX) > GCD_MAX)) {
 				m_ra += 0x60;
@@ -3726,8 +3731,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_SBC_A_HL_INDIRECT:
-					val = m_mmu->read_byte(hl()) + carry;
 
+					val = m_mmu->read_byte(hl()) + carry;
 					if(m_ra < val) {
 						m_rf |= GB_FLAG_C;
 					}
@@ -3745,8 +3750,8 @@ namespace GB_NS {
 					m_last = 2;
 					break;
 				case GB_CODE_SBC_A_N:
-					val = m_mmu->read_byte(m_pc++) + carry;
 
+					val = m_mmu->read_byte(m_pc++) + carry;
 					if(m_ra < val) {
 						m_rf |= GB_FLAG_C;
 					}
@@ -4588,8 +4593,8 @@ namespace GB_NS {
 					m_last = 1;
 					break;
 				case GB_CODE_SUB_A_HL_INDIRECT:
-					val = m_mmu->read_byte(hl());
 
+					val = m_mmu->read_byte(hl());
 					if(m_ra < val) {
 						m_rf |= GB_FLAG_C;
 					}
@@ -4607,8 +4612,8 @@ namespace GB_NS {
 					m_last = 2;
 					break;
 				case GB_CODE_SUB_A_N:
-					val = m_mmu->read_byte(m_pc++);
 
+					val = m_mmu->read_byte(m_pc++);
 					if(m_ra < val) {
 						m_rf |= GB_FLAG_C;
 					}
@@ -4869,6 +4874,35 @@ namespace GB_NS {
 		}
 
 		void 
+		_gb_cpu::operational(void)
+		{
+
+			if(!m_init) {
+				THROW_GB_CPU_EXCEPTION(GB_CPU_EXCEPTION_UNINITIALIZED);
+			}
+
+			m_ra = GB_REG_A_OPER;
+			m_rb = GB_REG_B_OPER;
+			m_rc = GB_REG_C_OPER;
+			m_rd = GB_REG_D_OPER;
+			m_re = GB_REG_E_OPER;
+			m_rf = GB_REG_F_OPER;
+			m_rh = GB_REG_H_OPER;
+			m_rl = GB_REG_L_OPER;
+			m_last = 0;
+			m_rva = GB_REG_A_ALT_OPER;
+			m_rvb = GB_REG_B_ALT_OPER;
+			m_rvc = GB_REG_C_ALT_OPER;
+			m_rvd = GB_REG_D_ALT_OPER;
+			m_rve = GB_REG_E_ALT_OPER;
+			m_rvf = GB_REG_F_ALT_OPER;
+			m_rvh = GB_REG_H_ALT_OPER;
+			m_rvl = GB_REG_L_ALT_OPER;
+			m_sp = GB_REG_SP_OPER;
+			m_tot = 0;
+		}
+
+		void 
 		_gb_cpu::reset(void)
 		{
 
@@ -5055,14 +5089,20 @@ namespace GB_NS {
 					<< " (ptr=0x" << VAL_AS_HEX(gb_cpu_ptr, this) << ")";
 
 			if(m_init && verb) {
-				res << std::endl << "A=0x" << VAL_AS_HEX(gbb_t, m_ra) << " (A'=0x" << VAL_AS_HEX(gbb_t, m_rva) << ")"
-					<< std::endl<< "B=0x" << VAL_AS_HEX(gbb_t, m_rb) << " (B'=0x" << VAL_AS_HEX(gbb_t, m_rvb) << ")"
-					<< std::endl << "C=0x" << VAL_AS_HEX(gbb_t, m_rc) << " (C'=0x" << VAL_AS_HEX(gbb_t, m_rvc) << ")"
-					<< std::endl << "D=0x" << VAL_AS_HEX(gbb_t, m_rd) << " (D'=0x" << VAL_AS_HEX(gbb_t, m_rvd) << ")" 
-					<< std::endl << "E=0x" << VAL_AS_HEX(gbb_t, m_re) << " (E'=0x" << VAL_AS_HEX(gbb_t, m_rve) << ")";
-
-				res << std::endl << "H=0x" << VAL_AS_HEX(gbb_t, m_rh) << " (H'=0x" << VAL_AS_HEX(gbb_t, m_rvh) << ")"
-					<< std::endl << "L=0x" << VAL_AS_HEX(gbb_t, m_rl) << " (L'=0x" << VAL_AS_HEX(gbb_t, m_rvl) << ")"
+				res << std::endl << "A=0x" << VAL_AS_HEX(gbb_t, m_ra) 
+					<< " (A'=0x" << VAL_AS_HEX(gbb_t, m_rva) << ")"
+					<< std::endl<< "B=0x" << VAL_AS_HEX(gbb_t, m_rb) 
+					<< " (B'=0x" << VAL_AS_HEX(gbb_t, m_rvb) << ")"
+					<< std::endl << "C=0x" << VAL_AS_HEX(gbb_t, m_rc) 
+					<< " (C'=0x" << VAL_AS_HEX(gbb_t, m_rvc) << ")"
+					<< std::endl << "D=0x" << VAL_AS_HEX(gbb_t, m_rd) 
+					<< " (D'=0x" << VAL_AS_HEX(gbb_t, m_rvd) << ")" 
+					<< std::endl << "E=0x" << VAL_AS_HEX(gbb_t, m_re) 
+					<< " (E'=0x" << VAL_AS_HEX(gbb_t, m_rve) << ")" 
+					<< std::endl << "H=0x" << VAL_AS_HEX(gbb_t, m_rh) 
+					<< " (H'=0x" << VAL_AS_HEX(gbb_t, m_rvh) << ")"
+					<< std::endl << "L=0x" << VAL_AS_HEX(gbb_t, m_rl) 
+					<< " (L'=0x" << VAL_AS_HEX(gbb_t, m_rvl) << ")"
 					<< std::endl << "F=0x" << VAL_AS_HEX(gbb_t, m_rf);
 
 				if(m_rf >= GB_FLAG_C) {

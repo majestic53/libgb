@@ -213,6 +213,7 @@ namespace GB_NS {
 		m_inst_gpu->start(rom.title(), true);
 		m_inst_mmu->insert(0, rom.buffer());
 		m_inst_mmu->insert(0, GB_BIOS_RAW);
+		m_inst_cpu->reset();
 		m_inst_cpu->start();
 
 		while(m_active) {
@@ -220,26 +221,30 @@ namespace GB_NS {
 			if(!m_inst_cpu->is_halted() && !m_inst_cpu->is_stopped()) {
 
 				if(bios && !m_inst_cpu->is_zero_page()) {
+
+					if(m_inst_cpu->count() != (GB_BIOS_ADDR_STOP + 1)) {
+						THROW_GB_GB_EXCEPTION_MESSAGE(GB_GB_EXCEPTION_BIOS_FAILED, 
+							"pc=0x%04x (expected 0x%04x)", m_inst_cpu->count(),
+							GB_REG_PC_OPER);
+					}
+
 					bios = false;
 					m_inst_mmu->insert(0, gb_buf_t(rom.buffer().begin(), 
 						rom.buffer().begin() + (GB_BIOS_ADDR_STOP + 1)));
-
-					std::cout << m_inst_mmu->to_string(true, 0, 0x8000) << std::endl;
-
-					// TODO: set all registers to post-bios defaults
-					std::cin.get();
-					//
-
-				} else {
-
-					// TODO: step CPU here
-					m_inst_cpu->step();
-					//sleep(1);
-					// ---
+					m_inst_cpu->operational();
+					m_inst_mmu->operational();
 				}
+
+				m_inst_cpu->step();
+
+				// TODO: might need to slow down execution here
+
 			} else {
 
 				// TODO: busy wait, fix this!
+				usleep(10);
+				// ---
+
 			}
 		}
 

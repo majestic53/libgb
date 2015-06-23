@@ -34,6 +34,8 @@ namespace GB_NS {
 
 				static _gb_cpu *acquire(void);
 
+				gb_addr_t count(void);
+
 				void halt(void);
 
 				void initialize(void);
@@ -47,6 +49,8 @@ namespace GB_NS {
 				bool is_stopped(void);
 
 				bool is_zero_page(void);
+
+				void operational(void);
 
 				void reset(void);
 

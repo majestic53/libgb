@@ -78,7 +78,7 @@ namespace GB_NS {
 			va_end(lst);
 		}
 
-#ifndef NDEBUG
+#ifdef NDEBUG
 		res << " (" << file << ":" << line << ")";
 #endif // NDEBUG
 		throw std::runtime_error(res.str().c_str());

@@ -32,6 +32,8 @@ namespace GB_NS {
 	
 	enum {
 		GB_GB_EXCEPTION_ALLOC_FAILED = 0,
+		GB_GB_EXCEPTION_BIOS_FAILED,
+		GB_GB_EXCEPTION_BIOS_EXPORT_FAILED,
 		GB_GB_EXCEPTION_INITIALIZED,
 		GB_GB_EXCEPTION_UNINITIALIZED,
 		GB_GB_EXCEPTION_UNSUPPORTED,
@@ -41,6 +43,8 @@ namespace GB_NS {
 	
 	static const std::string GB_GB_EXCEPTION_STR[] = {
 		GB_GB_EXCEPTION_HEADER " Failed to allocate library",
+		GB_GB_EXCEPTION_HEADER " Failed to transition to operational mode",
+		GB_GB_EXCEPTION_HEADER " Failed to export BIOS",
 		GB_GB_EXCEPTION_HEADER " Library is already initialized",
 		GB_GB_EXCEPTION_HEADER " Library is uninitialized",
 		GB_GB_EXCEPTION_HEADER " Unsupported cartridge type",

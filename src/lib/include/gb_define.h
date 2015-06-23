@@ -45,8 +45,8 @@ namespace GB_NS {
 	#define BLD_NAME "LIBGB"
 	#define BLD_VER_MAJ 0
 	#define BLD_VER_MIN 1
-	#define BLD_VER_REV 6
-	#define BLD_VER_WEEK 1525
+	#define BLD_VER_REV 1
+	#define BLD_VER_WEEK 1526
 	#define BLK_LEN 0x10
 	#define BITS_PER_BYTE 8
 	#define BITS_PER_NIBBLE 5

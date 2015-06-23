@@ -61,6 +61,8 @@ namespace GB_NS {
 				
 				bool is_initialized(void);
 				
+				void operational(void);
+
 				gbb_t read_byte(
 					__in gb_addr_t addr
 					);

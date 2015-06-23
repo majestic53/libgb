@@ -62,11 +62,6 @@ namespace GB_NS {
 		{
 
 			if(m_init) {
-
-				if(m_active) {
-					stop();
-				}
-
 				uninitialize();
 			}
 		}
@@ -105,17 +100,17 @@ namespace GB_NS {
 			glfwSetErrorCallback(graphics_error);
 
 			if(!glfwInit()) {
-				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, "%s", 
-					CAT_STR(glfwInit));
+				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, 
+					"%s", CAT_STR(glfwInit));
 			}
 
-			win = glfwCreateWindow(GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, CHK_STR(gb_gpu::m_title), 
-				NULL, NULL);
+			win = glfwCreateWindow(GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, 
+				CHK_STR(gb_gpu::m_title), NULL, NULL);
 
 			if(!win) {
 				glfwTerminate();
-				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, "%s", 
-					CAT_STR(glfwCreateWindow));
+				THROW_GB_GPU_EXCEPTION_MESSAGE(GB_GPU_EXCEPTION_INTERNAL, 
+					"%s", CAT_STR(glfwCreateWindow));
 			}
 
 			mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
