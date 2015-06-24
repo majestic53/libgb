@@ -19,7 +19,7 @@
 
 #include "../lib/include/gb.h"
 
-#define TEST_PATH "./test/test.gb"
+#define TEST_PATH "./test/test0.gb"
 
 int 
 main(void) 

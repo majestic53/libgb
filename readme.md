@@ -15,6 +15,10 @@ Changelog
 =========
 
 ###Version 0.1.1526
+*Updated: 6/23/2015*
+
+* Basic rendering is now working
+
 *Updated: 6/22/2015*
 
 * Added operational mode

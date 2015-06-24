@@ -34,6 +34,17 @@ namespace GB_NS {
 	#define GB_INT_STOP_INIT true
 	#define GB_INT_STOP_OPER true
 
+	#define GB_GFX_TILE_MAP_0 0x9800
+	#define GB_GFX_TILE_MAP_1 0x9c00
+
+	#define GB_LCDC_BG_DISP 0x01
+	#define GB_LCDC_BG_TILE_MAP_DISP_SEL 0x08
+	#define GB_LCDC_ENABLE 0x80
+	#define GB_LCDC_OBJ_DISP 0x02
+	#define GB_LCDC_OBJ_SIZE 0x04
+	#define GB_LCDC_WIN_DISP 0x10
+	#define GB_LCDC_WIN_TILE_MAP_DISP_SEL 0x20
+
 	#define GB_REG_A_INIT 0x00
 	#define GB_REG_A_OPER 0x01
 	#define GB_REG_A_ALT_INIT 0x00

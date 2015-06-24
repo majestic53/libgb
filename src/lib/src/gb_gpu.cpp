@@ -17,12 +17,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include "../include/gb.h"
 #include "../include/gb_gpu_type.h"
 
 namespace GB_NS {
 
 	namespace GB_COMP_NS {
+
+		typedef enum {
+			GB_COLOR_WHITE = 0, // 0x00
+			GB_COLOR_GREY_LIGHT, // 0x60
+			GB_COLOR_GREY_DARK, // 0xc0
+			GB_COLOR_BLACK, // 0xff
+		} gb_col_t;
+
+		#define GB_COLOR_MAX GB_COLOR_BLACK
+
+		static const float GB_COLOR_VAL[] = {
+			0xff, 0xc0, 0x60, 0x00,
+			};
+
+		#define GB_COLOR_VALUE_I(_TYPE_) \
+			((_TYPE_) > GB_COLOR_MAX ? 0 : \
+			GB_COLOR_VAL[_TYPE_])
+
+		#define GB_COLOR_VALUE_F(_TYPE_) \
+			((_TYPE_) > GB_COLOR_MAX ? 0.f : \
+			GB_COLOR_VAL[_TYPE_] / (float) UINT8_MAX)
 
 		#define GB_GPU_HBLNK_CLK 204
 		#define GB_GPU_HLINE_LEN 144
@@ -32,6 +54,7 @@ namespace GB_NS {
 		#define GB_GPU_VLINE_LEN 160
 		#define GB_GPU_VLINE_MAX 153
 		#define GB_GPU_VRAM_CLK 172
+		#define GB_RGB_LEN 3
 		#define GB_SWAP_INTERVAL 1
 
 		static const std::string GB_GPU_STATE_STR[] = {
@@ -164,32 +187,37 @@ namespace GB_NS {
 			__in GLFWwindow *win
 			)
 		{
-			float ratio;
+			GLuint frame;
 			int height, width;
 
 			if(gb_gpu::m_update) {
 				gb_gpu::m_update = false;
-
-				// TODO: draw m_buf to win
 				glfwGetFramebufferSize(win, &width, &height);
-				ratio = width / (float) height;
 				glViewport(0, 0, width, height);
+				glGenTextures(1, &frame);
+				glBindTexture(GL_TEXTURE_2D, frame);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, 0, 
+					GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *) &m_buf[0]);
+				glLoadIdentity();
+				glEnable(GL_TEXTURE_2D);				
 				glClear(GL_COLOR_BUFFER_BIT);
-				glMatrixMode(GL_PROJECTION);
-				glLoadIdentity();
-				glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-				glMatrixMode(GL_MODELVIEW);
-				glLoadIdentity();
-				glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
-				glBegin(GL_TRIANGLES);
-				glColor3f(1.f, 0.f, 0.f);
-				glVertex3f(-0.6f, -0.4f, 0.f);
-				glColor3f(0.f, 1.f, 0.f);
-				glVertex3f(0.6f, -0.4f, 0.f);
-				glColor3f(0.f, 0.f, 1.f);
-				glVertex3f(0.f, 0.6f, 0.f);
+				glClearColor(0.f, 0.f, 0.f, 1.f);
+				glTranslatef(0.f, 0.f, 0.f);
+				glBindTexture(GL_TEXTURE_2D, frame);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0.f, 1.f);
+					glVertex3f(-1.f, -1.0f, 0.f);
+					glTexCoord2f(1.f, 1.f);
+					glVertex3f(1.f, -1.f, 0.f);
+					glTexCoord2f(1.f, 0.f);
+					glVertex3f(1.f, 1.f, 0.f);
+					glTexCoord2f(0.f, 0.f);
+					glVertex3f(-1.f, 1.f, 0.f);
 				glEnd();
-				// ---
+				glDisable(GL_TEXTURE_2D);
 			}
 		}
 
@@ -385,7 +413,8 @@ namespace GB_NS {
 			}
 
 			m_title = title;
-			m_buf.resize(GB_GPU_VLINE_LEN * GB_GPU_HLINE_LEN);
+			m_buf.resize(GB_GPU_VLINE_LEN * GB_GPU_HLINE_LEN * GB_RGB_LEN, 
+				GB_COLOR_VALUE_I(GB_COLOR_WHITE));
 			m_graphics_thread = std::thread(gb_gpu::graphics);
 
 			if(detach) {
@@ -400,7 +429,8 @@ namespace GB_NS {
 			__in gbb_t last
 			)
 		{
-			gbb_t off;
+			gbb_t lcdc, off;
+			gb_addr_t map_addr;
 
 			if(!m_init) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_UNINITIALIZED);
@@ -461,7 +491,14 @@ namespace GB_NS {
 						m_tot = 0;
 
 						if(m_active) {
-							// TODO: write line into m_buf
+
+							lcdc = m_mmu->read_byte(GB_REG_LCDC);
+							if(lcdc & GB_LCDC_ENABLE) {
+								map_addr = lcdc & GB_LCDC_BG_TILE_MAP_DISP_SEL ? 
+									GB_GFX_TILE_MAP_1 : GB_GFX_TILE_MAP_0;
+
+								// TODO: render m_line to m_buf
+							}
 						}
 					}
 					break;
