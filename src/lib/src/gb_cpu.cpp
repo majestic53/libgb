@@ -24,6 +24,51 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
+		#define GB_FLAG_C 0x10
+		#define GB_FLAG_H 0x20
+		#define GB_FLAG_N 0x40
+		#define GB_FLAG_Z 0x80
+		#define GB_INT_HALT_INIT false
+		#define GB_INT_HALT_OPER false
+		#define GB_INT_IME_OPER true
+		#define GB_INT_STOP_INIT true
+		#define GB_INT_STOP_OPER true
+		#define GB_REG_A_INIT 0x00
+		#define GB_REG_A_OPER 0x01
+		#define GB_REG_A_ALT_INIT 0x00
+		#define GB_REG_A_ALT_OPER 0x00
+		#define GB_REG_B_INIT 0x00
+		#define GB_REG_B_OPER 0x00
+		#define GB_REG_B_ALT_INIT 0x00
+		#define GB_REG_B_ALT_OPER 0x00
+		#define GB_REG_C_INIT 0x00
+		#define GB_REG_C_OPER 0x13
+		#define GB_REG_C_ALT_INIT 0x00
+		#define GB_REG_C_ALT_OPER 0x00
+		#define GB_REG_D_INIT 0x00
+		#define GB_REG_D_OPER 0x00
+		#define GB_REG_D_ALT_INIT 0x00
+		#define GB_REG_D_ALT_OPER 0x00
+		#define GB_REG_E_INIT 0x00
+		#define GB_REG_E_OPER 0xd8
+		#define GB_REG_E_ALT_INIT 0x00
+		#define GB_REG_E_ALT_OPER 0x00
+		#define GB_REG_F_INIT 0x00
+		#define GB_REG_F_OPER 0xb0
+		#define GB_REG_F_ALT_INIT 0x00
+		#define GB_REG_F_ALT_OPER 0x00
+		#define GB_REG_H_INIT 0x00
+		#define GB_REG_H_OPER 0x01
+		#define GB_REG_H_ALT_INIT 0x00
+		#define GB_REG_H_ALT_OPER 0x00
+		#define GB_REG_L_INIT 0x00
+		#define GB_REG_L_OPER 0x4d
+		#define GB_REG_L_ALT_INIT 0x00
+		#define GB_REG_L_ALT_OPER 0x00
+		#define GB_REG_PC_INIT 0x0000
+		#define GB_REG_SP_INIT 0x0000
+		#define GB_REG_SP_OPER 0xfffe
+
 		static const gb_addr_t GB_INTERRUPT_ADDR[] = {
 			0x40, 0x48, 0x50, 0x58, 0x60,
 			};

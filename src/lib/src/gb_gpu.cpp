@@ -25,6 +25,26 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
+		#define GB_GFX_TILE_MAP_0 0x9800
+		#define GB_GFX_TILE_MAP_1 0x9c00
+		#define GB_GPU_HBLNK_CLK 204
+		#define GB_GPU_HLINE_LEN 144
+		#define GB_GPU_HLINE_MAX 143
+		#define GB_GPU_OAM_CLK 80
+		#define GB_GPU_VBLNK_CLK 456
+		#define GB_GPU_VLINE_LEN 160
+		#define GB_GPU_VLINE_MAX 153
+		#define GB_GPU_VRAM_CLK 172
+		#define GB_LCDC_BG_DISP 0x01
+		#define GB_LCDC_BG_TILE_MAP_DISP_SEL 0x08
+		#define GB_LCDC_ENABLE 0x80
+		#define GB_LCDC_OBJ_DISP 0x02
+		#define GB_LCDC_OBJ_SIZE 0x04
+		#define GB_LCDC_WIN_DISP 0x10
+		#define GB_LCDC_WIN_TILE_MAP_DISP_SEL 0x20
+		#define GB_RGB_LEN 3
+		#define GB_SWAP_INTERVAL 1
+
 		typedef enum {
 			GB_COLOR_WHITE = 0, // 0x00
 			GB_COLOR_GREY_LIGHT, // 0x60
@@ -45,17 +65,6 @@ namespace GB_NS {
 		#define GB_COLOR_VALUE_F(_TYPE_) \
 			((_TYPE_) > GB_COLOR_MAX ? 0.f : \
 			GB_COLOR_VAL[_TYPE_] / (float) UINT8_MAX)
-
-		#define GB_GPU_HBLNK_CLK 204
-		#define GB_GPU_HLINE_LEN 144
-		#define GB_GPU_HLINE_MAX 143
-		#define GB_GPU_OAM_CLK 80
-		#define GB_GPU_VBLNK_CLK 456
-		#define GB_GPU_VLINE_LEN 160
-		#define GB_GPU_VLINE_MAX 153
-		#define GB_GPU_VRAM_CLK 172
-		#define GB_RGB_LEN 3
-		#define GB_SWAP_INTERVAL 1
 
 		static const std::string GB_GPU_STATE_STR[] = {
 			"HBLANK", "VBLANK", "OAM", "VRAM",

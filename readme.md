@@ -18,6 +18,7 @@ Changelog
 *Updated: 6/23/2015*
 
 * Basic rendering is now working
+* Minor code cleanup
 
 *Updated: 6/22/2015*
 

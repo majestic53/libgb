@@ -23,6 +23,21 @@
 
 namespace GB_NS {
 
+	#define GB_ROM_ADDR_START 0x0100 // - 0x0103
+	#define GB_ROM_ADDR_GRX 0x0104 // - 0x0133
+	#define GB_ROM_ADDR_TITLE 0x0134 // - 0x0142
+	#define GB_ROM_ADDR_TYPE 0x0143
+	#define GB_ROM_ADDR_LIC 0x0144 // - 0x0145
+	#define GB_ROM_ADDR_IND 0x0146
+	#define GB_ROM_ADDR_CART_TYPE 0x0147
+	#define GB_ROM_ADDR_ROM_SIZE 0x0148
+	#define GB_ROM_ADDR_RAM_SIZE 0x0149
+	#define GB_ROM_ADDR_DEST 0x014a
+	#define GB_ROM_ADDR_LIC_OLD 0x014b
+	#define GB_ROM_ADDR_MROM_VER 0x014c
+	#define GB_ROM_ADDR_COMP_CHK 0x014d
+	#define GB_ROM_ADDR_CHKSUM 0x014e // - 0x014f
+
 	_gb_rom::_gb_rom(
 		__in const std::string &in,
 		__in_opt bool path

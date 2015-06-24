@@ -22,68 +22,13 @@
 
 namespace GB_NS {
 
-	#define GB_FLAG_C 0x10
-	#define GB_FLAG_H 0x20
-	#define GB_FLAG_N 0x40
-	#define GB_FLAG_Z 0x80
-
-	#define GB_INT_HALT_INIT false
-	#define GB_INT_HALT_OPER false
-	#define GB_INT_IME_INIT true
-	#define GB_INT_IME_OPER true
-	#define GB_INT_STOP_INIT true
-	#define GB_INT_STOP_OPER true
-
-	#define GB_GFX_TILE_MAP_0 0x9800
-	#define GB_GFX_TILE_MAP_1 0x9c00
-
-	#define GB_LCDC_BG_DISP 0x01
-	#define GB_LCDC_BG_TILE_MAP_DISP_SEL 0x08
-	#define GB_LCDC_ENABLE 0x80
-	#define GB_LCDC_OBJ_DISP 0x02
-	#define GB_LCDC_OBJ_SIZE 0x04
-	#define GB_LCDC_WIN_DISP 0x10
-	#define GB_LCDC_WIN_TILE_MAP_DISP_SEL 0x20
-
-	#define GB_REG_A_INIT 0x00
-	#define GB_REG_A_OPER 0x01
-	#define GB_REG_A_ALT_INIT 0x00
-	#define GB_REG_A_ALT_OPER 0x00
-	#define GB_REG_B_INIT 0x00
-	#define GB_REG_B_OPER 0x00
-	#define GB_REG_B_ALT_INIT 0x00
-	#define GB_REG_B_ALT_OPER 0x00
 	#define GB_REG_BGP 0xff47
 	#define GB_REG_BGP_OPER 0xfc
-	#define GB_REG_C_INIT 0x00
-	#define GB_REG_C_OPER 0x13
-	#define GB_REG_C_ALT_INIT 0x00
-	#define GB_REG_C_ALT_OPER 0x00
-	#define GB_REG_D_INIT 0x00
-	#define GB_REG_D_OPER 0x00
-	#define GB_REG_D_ALT_INIT 0x00
-	#define GB_REG_D_ALT_OPER 0x00
 	#define GB_REG_DIV 0xff04
 	#define GB_REG_DMA 0xff46
-	#define GB_REG_E_INIT 0x00
-	#define GB_REG_E_OPER 0xd8
-	#define GB_REG_E_ALT_INIT 0x00
-	#define GB_REG_E_ALT_OPER 0x00
-	#define GB_REG_F_INIT 0x00
-	#define GB_REG_F_OPER 0xb0
-	#define GB_REG_F_ALT_INIT 0x00
-	#define GB_REG_F_ALT_OPER 0x00
-	#define GB_REG_H_INIT 0x00
-	#define GB_REG_H_OPER 0x01
-	#define GB_REG_H_ALT_INIT 0x00
-	#define GB_REG_H_ALT_OPER 0x00
 	#define GB_REG_IE 0xffff
 	#define GB_REG_IE_OPER 0x00
 	#define GB_REG_IF 0xff0f
-	#define GB_REG_L_INIT 0x00
-	#define GB_REG_L_OPER 0x4d
-	#define GB_REG_L_ALT_INIT 0x00
-	#define GB_REG_L_ALT_OPER 0x00
 	#define GB_REG_LCDC 0xff40
 	#define GB_REG_LCDC_OPER 0x91
 	#define GB_REG_LY 0xff44
@@ -133,8 +78,6 @@ namespace GB_NS {
 	#define GB_REG_OBP1 0xff49
 	#define GB_REG_OBP1_OPER 0xff
 	#define GB_REG_P1 0xff00
-	#define GB_REG_PC_INIT 0x0000
-	#define GB_REG_PC_OPER 0x0100
 	#define GB_REG_RST_VEC_0 0x00
 	#define GB_REG_RST_VEC_8 0x08
 	#define GB_REG_RST_VEC_10 0x10
@@ -149,8 +92,6 @@ namespace GB_NS {
 	#define GB_REG_SCX_OPER 0x00
 	#define GB_REG_SCY 0xff42
 	#define GB_REG_SCY_OPER 0x00
-	#define GB_REG_SP_INIT 0x0000
-	#define GB_REG_SP_OPER 0xfffe
 	#define GB_REG_STAT 0xff41
 	#define GB_REG_TIMA 0xff05
 	#define GB_REG_TIMA_OPER 0x00
@@ -164,31 +105,6 @@ namespace GB_NS {
 	#define GB_REG_WX_OPER 0x00
 	#define GB_REG_WY 0xff4a
 	#define GB_REG_WY_OPER 0x00
-
-	#define GB_ROM_ADDR_START 0x0100 // - 0x0103
-	#define GB_ROM_ADDR_GRX 0x0104 // - 0x0133
-	#define GB_ROM_ADDR_TITLE 0x0134 // - 0x0142
-	#define GB_ROM_ADDR_TYPE 0x0143
-	#define GB_ROM_ADDR_LIC 0x0144 // - 0x0145
-	#define GB_ROM_ADDR_IND 0x0146
-	#define GB_ROM_ADDR_CART_TYPE 0x0147
-	#define GB_ROM_ADDR_ROM_SIZE 0x0148
-	#define GB_ROM_ADDR_RAM_SIZE 0x0149
-	#define GB_ROM_ADDR_DEST 0x014a
-	#define GB_ROM_ADDR_LIC_OLD 0x014b
-	#define GB_ROM_ADDR_MROM_VER 0x014c
-	#define GB_ROM_ADDR_COMP_CHK 0x014d
-	#define GB_ROM_ADDR_CHKSUM 0x014e // - 0x014f
-
-	typedef enum {
-		GB_INTERRUPT_VBLNK = 0,
-		GB_INTERRUPT_LCD_STAT,
-		GB_INTERRUPT_TIMER_OVR,
-		GB_INTERRUPT_SIO_TRANS,
-		GB_INTERRUPT_JOY_PRESS,
-	} gb_int_t;
-
-	#define GB_INTERRUPT_MAX GB_INTERRUPT_JOY_PRESS
 }
 
 #endif // GB_REG_H_

@@ -24,6 +24,19 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
+		#define GB_INT_IME_INIT true
+		#define GB_REG_PC_OPER 0x0100
+
+		typedef enum {
+			GB_INTERRUPT_VBLNK = 0,
+			GB_INTERRUPT_LCD_STAT,
+			GB_INTERRUPT_TIMER_OVR,
+			GB_INTERRUPT_SIO_TRANS,
+			GB_INTERRUPT_JOY_PRESS,
+		} gb_int_t;
+
+		#define GB_INTERRUPT_MAX GB_INTERRUPT_JOY_PRESS
+
 		typedef class _gb_cpu {
 
 			public:
