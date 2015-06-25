@@ -193,7 +193,8 @@ namespace GB_NS {
 	void 
 	_gb::start(
 		__in const std::string &in,
-		__in_opt bool path
+		__in_opt bool path,
+		__in_opt gb_col_th_t theme
 		)
 	{
 		bool bios = true;
@@ -210,7 +211,7 @@ namespace GB_NS {
 		}
 
 		m_active = true;
-		m_inst_gpu->start(rom.title(), true);
+		m_inst_gpu->start(rom.title(), theme, true);
 		m_inst_mmu->insert(0, rom.buffer());
 		m_inst_mmu->insert(0, GB_BIOS_RAW);
 		m_inst_cpu->reset();

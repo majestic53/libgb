@@ -30,6 +30,7 @@
 #include "gb_except.h"
 #include "gb_bios.h"
 #include "gb_cmd.h"
+#include "gb_col.h"
 #include "gb_key.h"
 #include "gb_reg.h"
 #include "gb_rom.h"
@@ -77,7 +78,8 @@ namespace GB_NS {
 
 			void start(
 				__in const std::string &in,
-				__in_opt bool path = false
+				__in_opt bool path = false,
+				__in_opt gb_col_th_t theme = GB_COL_TH_GREY
 				);
 
 			static void stop(void);

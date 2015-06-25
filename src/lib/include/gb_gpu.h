@@ -33,6 +33,10 @@ namespace GB_NS {
 
 		#define GB_GPU_STATE_MAX GB_GPU_STATE_VRAM
 
+		#define GB_GPU_SCR_DIM 256
+
+		typedef gb_px_t gb_px_buf_t[GB_GPU_SCR_DIM * GB_GPU_SCR_DIM];
+
 		typedef class _gb_gpu {
 
 			public:
@@ -55,6 +59,7 @@ namespace GB_NS {
 
 				void start(
 					__in_opt const std::string &title = std::string(),
+					__in_opt gb_col_th_t theme = GB_COL_TH_GREY,
 					__in_opt bool detach = true
 					);
 
@@ -105,13 +110,15 @@ namespace GB_NS {
 					__in GLFWwindow *win
 					);
 
+				void render_line(void);
+
 				bool m_init;
 
 				static _gb_gpu *m_inst;
 
 				static bool m_active, m_update;
 
-				static gb_buf_t m_buf;
+				static gb_px_buf_t m_buf;
 
 				static gbb_t m_line;
 
@@ -124,6 +131,8 @@ namespace GB_NS {
 				std::thread m_graphics_thread;
 
 				gb_gpu_st_t m_state;
+
+				gb_col_th_t m_theme;
 
 				uint32_t m_tot;
 

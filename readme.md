@@ -15,6 +15,11 @@ Changelog
 =========
 
 ###Version 0.1.1526
+*Updated: 6/24/2015*
+
+* Added theme support
+* Changed openGL rendering method
+
 *Updated: 6/23/2015*
 
 * Basic rendering is now working

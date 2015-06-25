@@ -36,7 +36,7 @@ main(void)
 
 		// TODO: DEBUG
 		//std::cout << inst->to_string(true) << std::endl;		
-		inst->start(TEST_PATH, true);
+		inst->start(TEST_PATH, true, GB_COL_TH_TEAL);
 		// ---
 
 		inst->uninitialize();

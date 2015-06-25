@@ -25,6 +25,10 @@ namespace GB_NS {
 
 	namespace GB_COMP_NS {
 
+		#define GB_GFX_TILE_DATA_0 0x8800
+		#define GB_GFX_TILE_DATA_1 0x8000
+		#define GB_GFX_TILE_DIM 32
+		#define GB_GFX_TILE_LEN 16
 		#define GB_GFX_TILE_MAP_0 0x9800
 		#define GB_GFX_TILE_MAP_1 0x9c00
 		#define GB_GPU_HBLNK_CLK 204
@@ -35,36 +39,18 @@ namespace GB_NS {
 		#define GB_GPU_VLINE_LEN 160
 		#define GB_GPU_VLINE_MAX 153
 		#define GB_GPU_VRAM_CLK 172
-		#define GB_LCDC_BG_DISP 0x01
-		#define GB_LCDC_BG_TILE_MAP_DISP_SEL 0x08
+
+		#define GB_LCDC_DISP 0x01
+		#define GB_LCDC_SPRITE_DISP 0x02
+		#define GB_LCDC_SPRITE_SIZE 0x04
+		#define GB_LCDC_TILE_MAP_SEL 0x08
+		#define GB_LCDC_TILE_WIN_DATA_SEL 0x10
+		#define GB_LCDC_WIN_DISP 0x20
+		#define GB_LCDC_WIN_TILE_MAP_SEL 0x40
 		#define GB_LCDC_ENABLE 0x80
-		#define GB_LCDC_OBJ_DISP 0x02
-		#define GB_LCDC_OBJ_SIZE 0x04
-		#define GB_LCDC_WIN_DISP 0x10
-		#define GB_LCDC_WIN_TILE_MAP_DISP_SEL 0x20
+
 		#define GB_RGB_LEN 3
 		#define GB_SWAP_INTERVAL 1
-
-		typedef enum {
-			GB_COLOR_WHITE = 0, // 0x00
-			GB_COLOR_GREY_LIGHT, // 0x60
-			GB_COLOR_GREY_DARK, // 0xc0
-			GB_COLOR_BLACK, // 0xff
-		} gb_col_t;
-
-		#define GB_COLOR_MAX GB_COLOR_BLACK
-
-		static const float GB_COLOR_VAL[] = {
-			0xff, 0xc0, 0x60, 0x00,
-			};
-
-		#define GB_COLOR_VALUE_I(_TYPE_) \
-			((_TYPE_) > GB_COLOR_MAX ? 0 : \
-			GB_COLOR_VAL[_TYPE_])
-
-		#define GB_COLOR_VALUE_F(_TYPE_) \
-			((_TYPE_) > GB_COLOR_MAX ? 0.f : \
-			GB_COLOR_VAL[_TYPE_] / (float) UINT8_MAX)
 
 		static const std::string GB_GPU_STATE_STR[] = {
 			"HBLANK", "VBLANK", "OAM", "VRAM",
@@ -74,9 +60,17 @@ namespace GB_NS {
 			((_TYPE_) > GB_GPU_STATE_MAX ? UNKNOWN : \
 			GB_GPU_STATE_STR[_TYPE_].c_str())
 
+		#define GB_GPU_SET_PIX(_TH_, _COL_, _X_, _Y_) {\
+			size_t off = ((_Y_) * GB_GPU_SCR_DIM) + (_X_); \
+			const gb_px_t *col = &GB_PX_COL_VALUE(_TH_, _COL_); \
+			m_buf[off].red = col->red; \
+			m_buf[off].green = col->green; \
+			m_buf[off].blue = col->blue; \
+			}
+
 		bool gb_gpu::m_active = false;
 		bool gb_gpu::m_update = false;
-		gb_buf_t gb_gpu::m_buf = gb_buf_t();
+		gb_px_buf_t gb_gpu::m_buf;
 		gbb_t gb_gpu::m_line = 0;
 		std::string gb_gpu::m_title(EMPTY);
 		gb_mmu_ptr gb_gpu::m_mmu = gb_mmu::acquire();
@@ -85,6 +79,7 @@ namespace GB_NS {
 		_gb_gpu::_gb_gpu(void) :			
 			m_init(false),
 			m_state(GB_GPU_STATE_HBLNK),
+			m_theme(GB_COL_TH_GREY),
 			m_tot(0)
 		{
 			std::atexit(gb_gpu::_delete);
@@ -136,7 +131,7 @@ namespace GB_NS {
 					"%s", CAT_STR(glfwInit));
 			}
 
-			win = glfwCreateWindow(GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, 
+			win = glfwCreateWindow(GB_GPU_SCR_DIM, GB_GPU_SCR_DIM, //GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, 
 				CHK_STR(gb_gpu::m_title), NULL, NULL);
 
 			if(!win) {
@@ -146,8 +141,8 @@ namespace GB_NS {
 			}
 
 			mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-			glfwSetWindowPos(win, (mode->width - GB_GPU_VLINE_LEN) / 2,
-				(mode->height - GB_GPU_HLINE_LEN) / 2);
+			glfwSetWindowPos(win, (mode->width - GB_GPU_SCR_DIM /*GB_GPU_VLINE_LEN*/) / 2,
+				(mode->height - GB_GPU_SCR_DIM /*GB_GPU_HLINE_LEN*/) / 2);
 			glfwMakeContextCurrent(win);
 			glfwSwapInterval(GB_SWAP_INTERVAL);
 			glfwSetWindowCloseCallback(win, graphics_close);
@@ -196,37 +191,16 @@ namespace GB_NS {
 			__in GLFWwindow *win
 			)
 		{
-			GLuint frame;
 			int height, width;
 
 			if(gb_gpu::m_update) {
 				gb_gpu::m_update = false;
 				glfwGetFramebufferSize(win, &width, &height);
 				glViewport(0, 0, width, height);
-				glGenTextures(1, &frame);
-				glBindTexture(GL_TEXTURE_2D, frame);
-				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-				glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, GB_GPU_VLINE_LEN, GB_GPU_HLINE_LEN, 0, 
-					GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *) &m_buf[0]);
 				glLoadIdentity();
-				glEnable(GL_TEXTURE_2D);				
-				glClear(GL_COLOR_BUFFER_BIT);
-				glClearColor(0.f, 0.f, 0.f, 1.f);
-				glTranslatef(0.f, 0.f, 0.f);
-				glBindTexture(GL_TEXTURE_2D, frame);
-				glBegin(GL_QUADS);
-					glTexCoord2f(0.f, 1.f);
-					glVertex3f(-1.f, -1.0f, 0.f);
-					glTexCoord2f(1.f, 1.f);
-					glVertex3f(1.f, -1.f, 0.f);
-					glTexCoord2f(1.f, 0.f);
-					glVertex3f(1.f, 1.f, 0.f);
-					glTexCoord2f(0.f, 0.f);
-					glVertex3f(-1.f, 1.f, 0.f);
-				glEnd();
-				glDisable(GL_TEXTURE_2D);
+				glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+				glDrawPixels(GB_GPU_SCR_DIM, GB_GPU_SCR_DIM, GL_RGB, GL_UNSIGNED_BYTE, 
+					(GLvoid *) m_buf);
 			}
 		}
 
@@ -390,6 +364,31 @@ namespace GB_NS {
 		}
 
 		void 
+		_gb_gpu::render_line(void)
+		{
+			gbw_t off_x;
+			gbb_t lcdc, tile_id;
+			gb_addr_t data_base_addr, map_base_addr, tile_addr;
+
+			lcdc = m_mmu->read_byte(GB_REG_LCDC);
+			if(lcdc & GB_LCDC_ENABLE) {
+				data_base_addr  = lcdc & GB_LCDC_TILE_WIN_DATA_SEL ? 
+					GB_GFX_TILE_DATA_1 : GB_GFX_TILE_DATA_0;
+				map_base_addr = lcdc & GB_LCDC_TILE_MAP_SEL ? 
+					GB_GFX_TILE_MAP_1 : GB_GFX_TILE_MAP_0;
+
+				for(off_x = 0; off_x < GB_GFX_TILE_DIM; ++off_x) {
+					tile_id = m_mmu->read_byte(map_base_addr 
+						+ ((m_line * GB_GFX_TILE_DIM) + off_x));
+					tile_addr = data_base_addr + (tile_id * GB_GFX_TILE_LEN);
+
+					// TODO: handle 8x8 tile held in tile_addr (16 bytes)
+					// and place into m_buf
+				}
+			}
+		}
+
+		void 
 		_gb_gpu::reset(void)
 		{
 
@@ -399,19 +398,22 @@ namespace GB_NS {
 
 			m_active = false;
 			m_update = false;
-			m_buf.clear();
+			memset(m_buf, 0, sizeof(gb_px_t) * GB_GPU_SCR_DIM * GB_GPU_SCR_DIM);
 			m_line = 0;
 			m_state = GB_GPU_STATE_HBLNK;
 			m_title.clear();
+			m_theme = GB_COL_TH_GREY;
 			m_tot = 0;
 		}
 
 		void 
 		_gb_gpu::start(
 			__in_opt const std::string &title,
+			__in_opt gb_col_th_t theme,
 			__in_opt bool detach
 			)
 		{
+			gbw_t x_off, y_off = 0;
 
 			if(!m_init) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_UNINITIALIZED);
@@ -422,8 +424,16 @@ namespace GB_NS {
 			}
 
 			m_title = title;
-			m_buf.resize(GB_GPU_VLINE_LEN * GB_GPU_HLINE_LEN * GB_RGB_LEN, 
-				GB_COLOR_VALUE_I(GB_COLOR_WHITE));
+			m_theme = theme;
+			memset(m_buf, 0, sizeof(gb_px_t) * GB_GPU_SCR_DIM * GB_GPU_SCR_DIM);
+
+			for(; y_off < GB_GPU_SCR_DIM; ++y_off) {
+
+				for(x_off = 0; x_off < GB_GPU_SCR_DIM; ++x_off) {
+					GB_GPU_SET_PIX(m_theme, GB_PX_COL_WHITE, x_off, y_off);
+				}
+			}
+
 			m_graphics_thread = std::thread(gb_gpu::graphics);
 
 			if(detach) {
@@ -438,8 +448,7 @@ namespace GB_NS {
 			__in gbb_t last
 			)
 		{
-			gbb_t lcdc, off;
-			gb_addr_t map_addr;
+			gbb_t off;
 
 			if(!m_init) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_UNINITIALIZED);
@@ -500,14 +509,7 @@ namespace GB_NS {
 						m_tot = 0;
 
 						if(m_active) {
-
-							lcdc = m_mmu->read_byte(GB_REG_LCDC);
-							if(lcdc & GB_LCDC_ENABLE) {
-								map_addr = lcdc & GB_LCDC_BG_TILE_MAP_DISP_SEL ? 
-									GB_GFX_TILE_MAP_1 : GB_GFX_TILE_MAP_0;
-
-								// TODO: render m_line to m_buf
-							}
+							render_line();
 						}
 					}
 					break;
@@ -535,7 +537,7 @@ namespace GB_NS {
 				m_graphics_thread.join();
 			}
 
-			m_buf.clear();
+			memset(m_buf, 0, sizeof(gb_px_t) * GB_GPU_SCR_DIM * GB_GPU_SCR_DIM);
 		}
 
 		std::string 
@@ -551,7 +553,7 @@ namespace GB_NS {
 			if(m_init && verb) {
 				res << std::endl << "STATE=" << GB_GPU_STATE_STRING(m_state) 
 					<< ", LINE=" << (int)m_line << ", TOTAL=" << m_tot << ", ACTIVE=" 
-					<< m_active;
+					<< m_active << ", THEME=" << GB_COL_TH_STRING(m_theme);
 			}
 
 			return res.str();
