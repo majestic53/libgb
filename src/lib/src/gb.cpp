@@ -234,6 +234,11 @@ namespace GB_NS {
 						rom.buffer().begin() + (GB_BIOS_ADDR_STOP + 1)));
 					m_inst_cpu->operational();
 					m_inst_mmu->operational();
+
+					// TODO: DEBUG
+					std::cout << "EXITING BIOS" << std::endl;
+					//std::cin.get();
+					// ---
 				}
 
 				m_inst_cpu->step();
@@ -243,6 +248,7 @@ namespace GB_NS {
 			} else {
 
 				// TODO: busy wait, fix this!
+				std::cout << "HALTED!" << std::endl;
 				usleep(10);
 				// ---
 

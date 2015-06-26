@@ -31,10 +31,12 @@ namespace GB_NS {
 		#define GB_GFX_TILE_LEN 16
 		#define GB_GFX_TILE_MAP_0 0x9800
 		#define GB_GFX_TILE_MAP_1 0x9c00
+		#define GB_GFX_TILE_PX_LEN 8
 		#define GB_GPU_HBLNK_CLK 204
 		#define GB_GPU_HLINE_LEN 144
 		#define GB_GPU_HLINE_MAX 143
 		#define GB_GPU_OAM_CLK 80
+		#define GB_GPU_SCR_WID 21
 		#define GB_GPU_VBLNK_CLK 456
 		#define GB_GPU_VLINE_LEN 160
 		#define GB_GPU_VLINE_MAX 153
@@ -48,6 +50,12 @@ namespace GB_NS {
 		#define GB_LCDC_WIN_DISP 0x20
 		#define GB_LCDC_WIN_TILE_MAP_SEL 0x40
 		#define GB_LCDC_ENABLE 0x80
+
+		#define GB_STAT_COIN 0x4
+		#define GB_STAT_INT_HBLNK_EN 0x8
+		#define GB_STAT_INT_VBLNK_EN 0x10
+		#define GB_STAT_INT_OAM_EN 0x20
+		#define GB_STAT_INT_COIN_EN 0x40
 
 		#define GB_RGB_LEN 3
 		#define GB_SWAP_INTERVAL 1
@@ -366,26 +374,56 @@ namespace GB_NS {
 		void 
 		_gb_gpu::render_line(void)
 		{
-			gbw_t off_x;
-			gbb_t lcdc, tile_id;
-			gb_addr_t data_base_addr, map_base_addr, tile_addr;
+			gb_col_t px;
+			gbw_t off_x, tile_data;
+			gbb_t lcdc, tile_id, tile_ln, tile_px_x, tile_px_y, tile_x;
+			gb_addr_t data_base_addr, map_base_addr, tile_addr, tile_px_x_base, tile_px_y_base;
 
+			// TODO: DEBUG
 			lcdc = m_mmu->read_byte(GB_REG_LCDC);
 			if(lcdc & GB_LCDC_ENABLE) {
 				data_base_addr  = lcdc & GB_LCDC_TILE_WIN_DATA_SEL ? 
 					GB_GFX_TILE_DATA_1 : GB_GFX_TILE_DATA_0;
 				map_base_addr = lcdc & GB_LCDC_TILE_MAP_SEL ? 
 					GB_GFX_TILE_MAP_1 : GB_GFX_TILE_MAP_0;
+				tile_ln = (m_line + m_mmu->read_byte(GB_REG_SCY)) / GB_GFX_TILE_PX_LEN;
 
-				for(off_x = 0; off_x < GB_GFX_TILE_DIM; ++off_x) {
+				for(off_x = 0; off_x < GB_GPU_SCR_WID; ++off_x) {
 					tile_id = m_mmu->read_byte(map_base_addr 
-						+ ((m_line * GB_GFX_TILE_DIM) + off_x));
+						+ ((tile_ln * GB_GPU_SCR_WID) + off_x));
 					tile_addr = data_base_addr + (tile_id * GB_GFX_TILE_LEN);
+					tile_px_x_base = off_x * GB_GFX_TILE_PX_LEN;
+					tile_px_y_base = tile_ln * GB_GFX_TILE_PX_LEN;
 
-					// TODO: handle 8x8 tile held in tile_addr (16 bytes)
-					// and place into m_buf
+					for(tile_x = 0, tile_px_y = 0; tile_x < GB_GFX_TILE_LEN; 
+							tile_x += 2, ++tile_px_y) {
+						tile_data = m_mmu->read_word(tile_addr + tile_x);
+
+						for(tile_px_x = 0; tile_px_x < GB_GFX_TILE_PX_LEN; ++tile_px_x) {
+
+							if((tile_data >> BITS_PER_BYTE) & (1 << tile_px_x)) {
+
+								if(tile_data & (1 << tile_px_x)) {
+									px = GB_PX_COL_BLACK;
+								} else {
+									px = GB_PX_COL_GREY_DARK;
+								}
+							} else {
+
+								if(tile_data & (1 << tile_px_x)) {
+									px = GB_PX_COL_GREY;
+								} else {
+									px = GB_PX_COL_WHITE;
+								}
+							}
+
+							GB_GPU_SET_PIX(m_theme, px, tile_px_x + tile_px_x_base,
+								tile_px_y + tile_px_y_base);
+						}
+					}
 				}
 			}
+			// ---
 		}
 
 		void 
@@ -425,6 +463,8 @@ namespace GB_NS {
 
 			m_title = title;
 			m_theme = theme;
+			m_state = GB_GPU_STATE_OAM;
+			m_mmu->write_byte(GB_REG_STAT, m_mmu->read_byte(GB_REG_STAT) | m_state);
 			memset(m_buf, 0, sizeof(gb_px_t) * GB_GPU_SCR_DIM * GB_GPU_SCR_DIM);
 
 			for(; y_off < GB_GPU_SCR_DIM; ++y_off) {
@@ -448,7 +488,7 @@ namespace GB_NS {
 			__in gbb_t last
 			)
 		{
-			gbb_t off;
+			gbb_t off, stat;
 
 			if(!m_init) {
 				THROW_GB_GPU_EXCEPTION(GB_GPU_EXCEPTION_UNINITIALIZED);
@@ -463,32 +503,39 @@ namespace GB_NS {
 						m_tot = 0;
 
 						if(++m_line >= GB_GPU_HLINE_MAX) {
+							stat = m_mmu->read_byte(GB_REG_STAT) & ~m_state;
 							m_state = GB_GPU_STATE_VBLNK;
+							m_mmu->write_byte(GB_REG_STAT, stat | m_state);
+
+							if(gb::interrupt_master_enable()
+									&& (stat & GB_STAT_INT_VBLNK_EN)) {
+
+								off = (1 << GB_INTERRUPT_VBLNK);
+								if(m_mmu->read_byte(GB_REG_IE) & off) {
+									m_mmu->write_byte(GB_REG_IF, m_mmu->read_byte(GB_REG_IF) | off);
+								}
+							}
 
 							if(m_active) {
 								m_update = true;
 							}
 
 						} else {
+							stat = m_mmu->read_byte(GB_REG_STAT) & ~m_state;
 							m_state = GB_GPU_STATE_OAM;
+							m_mmu->write_byte(GB_REG_STAT, stat | m_state);
 						}
 					}
 					break;
 				case GB_GPU_STATE_VBLNK:
 
-					if(gb::interrupt_master_enable()) {
-
-						off = (1 << GB_INTERRUPT_VBLNK);
-						if(m_mmu->read_byte(GB_REG_IE) & off) {
-							m_mmu->write_byte(GB_REG_IF, m_mmu->read_byte(GB_REG_IF) | off);
-						}
-					}
-
 					if(m_tot >= GB_GPU_VBLNK_CLK) {
 						m_tot = 0;
 
 						if(++m_line > GB_GPU_VLINE_MAX) {
+							stat = m_mmu->read_byte(GB_REG_STAT) & ~m_state;
 							m_state = GB_GPU_STATE_OAM;
+							m_mmu->write_byte(GB_REG_STAT, stat | m_state);
 							m_line = 0;
 						}
 
@@ -498,14 +545,18 @@ namespace GB_NS {
 				case GB_GPU_STATE_OAM:
 
 					if(m_tot >= GB_GPU_OAM_CLK) {
+						stat = m_mmu->read_byte(GB_REG_STAT) & ~m_state;
 						m_state = GB_GPU_STATE_VRAM;
+						m_mmu->write_byte(GB_REG_STAT, stat | m_state);
 						m_tot = 0;
 					}
 					break;
 				case GB_GPU_STATE_VRAM:
 
 					if(m_tot >= GB_GPU_VRAM_CLK) {
+						stat = m_mmu->read_byte(GB_REG_STAT) & ~m_state;
 						m_state = GB_GPU_STATE_HBLNK;
+						m_mmu->write_byte(GB_REG_STAT, stat | m_state);
 						m_tot = 0;
 
 						if(m_active) {
