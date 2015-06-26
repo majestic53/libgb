@@ -15,6 +15,10 @@ Changelog
 =========
 
 ###Version 0.1.1526
+*Updated: 6/25/2015*
+
+* Added graphics generation (broken)
+
 *Updated: 6/24/2015*
 
 * Added theme support
